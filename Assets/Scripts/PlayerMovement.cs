@@ -30,6 +30,8 @@ public class PlayerMovement : MonoBehaviour
     Vector3 currentMovement;
     float distance;
     Rigidbody kinematicRigidBody;
+
+    [SerializeField]
     CapsuleCollider capCollider;
 
     InputAction moveAction;
@@ -45,6 +47,8 @@ public class PlayerMovement : MonoBehaviour
     public bool KickInput { get; private set; }
 
     public static PlayerMovement Instance { get; private set; }
+
+    PlayerStateController stateController;
 
     private void Awake()
     {
@@ -66,16 +70,20 @@ public class PlayerMovement : MonoBehaviour
         {
             kinematicRigidBody = GetComponent<Rigidbody>();
         }
-        if (capCollider == null)
+        /*if (capCollider == null)
         {
             capCollider = GetComponent<CapsuleCollider>();
+        }*/
+        if (stateController == null)
+        {
+            stateController = GetComponent<PlayerStateController>();
         }
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        
+        stateController.CurrentState = PlayerStateController.CharacterStates.IDLE;
     }
 
     void RegisterInputActions()
@@ -115,10 +123,28 @@ public class PlayerMovement : MonoBehaviour
         currentMovement.x = worldDirection.x * speed;
         currentMovement.z = worldDirection.z * speed;
 
-        // cast a capsule forward from the character and see if it would collide with a wall if it moved any further
-        if (!Physics.CapsuleCast(top, bottom, capCollider.radius, worldDirection, out hit, (capCollider.radius / 2) + (speed * Time.deltaTime), wallMask))
+        // rotate toward movement direction
+        if (moveVal.x != 0 || moveVal.y != 0)
+        {
+            visualModel.rotation = Quaternion.Slerp(visualModel.rotation, Quaternion.LookRotation(worldDirection), slerpIntensity);
+        }
+
+        // cast a sphere forward from the character and see if it would collide with a wall if it moved any further
+        if (!Physics.SphereCast(transform.position, capCollider.height, worldDirection, out hit, (capCollider.height / 2) + (speed * Time.deltaTime), wallMask))
         {
             kinematicRigidBody.MovePosition(transform.position + (currentMovement * Time.deltaTime));
+
+            if (stateController.CurrentState != PlayerStateController.CharacterStates.RUNNING
+                && currentMovement.magnitude > 0
+                && stateController.CurrentState != PlayerStateController.CharacterStates.KICKING)
+            {
+                stateController.CurrentState = PlayerStateController.CharacterStates.RUNNING;
+            }
+            else if (currentMovement.magnitude <= 0 
+                && stateController.CurrentState != PlayerStateController.CharacterStates.KICKING)
+            {
+                stateController.CurrentState = PlayerStateController.CharacterStates.IDLE;
+            }
         }
         else
         {
@@ -145,17 +171,12 @@ public class PlayerMovement : MonoBehaviour
 
                 bounces++;
             }
-        }
+        }        
 
-        // rotate toward movement direction
-        if (moveVal.x != 0 || moveVal.y != 0)
-        {
-            visualModel.rotation = Quaternion.Slerp(visualModel.rotation, Quaternion.LookRotation(worldDirection), slerpIntensity);
-        }
-
-        if (kickAction.IsPressed())
+        if (kickAction.IsPressed() && stateController.CurrentState != PlayerStateController.CharacterStates.KICKING)
         {
             // TODO: do a kick
+            stateController.CurrentState = PlayerStateController.CharacterStates.KICKING;
         }
     }
 }
