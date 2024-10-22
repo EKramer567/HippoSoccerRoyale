@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class PlayerAnimController : MonoBehaviour
 {
+    [SerializeField]
+    PlayerStateController stateController;
+
     PlayerStateController.CharacterStates currentAnimState;
     PlayerStateController.CharacterStates prevAnimState;
 
@@ -19,13 +22,19 @@ public class PlayerAnimController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        PlayerStateController.Instance.CurrentState = PlayerStateController.CharacterStates.IDLE;
+        if (stateController != null)
+        {
+            GetComponent<PlayerStateController>();
+        }
+        currentAnimState = PlayerStateController.CharacterStates.IDLE;
+        prevAnimState = PlayerStateController.CharacterStates.DISABLED;
+        stateController.CurrentState = PlayerStateController.CharacterStates.IDLE;
     }
 
     // Update is called once per frame
     void Update()
     {
-        currentAnimState = PlayerStateController.Instance.CurrentState;
+        currentAnimState = stateController.CurrentState;
         if (currentAnimState != prevAnimState)
         {
             switch (currentAnimState)
@@ -56,6 +65,15 @@ public class PlayerAnimController : MonoBehaviour
                     break;
                 default:
                     break;
+            }
+            prevAnimState = currentAnimState;
+        }
+        else if (currentAnimState == PlayerStateController.CharacterStates.KICKING)
+        {
+            if (!animator.GetCurrentAnimatorStateInfo(0).IsName(kickAnimString))
+            {
+                stateController.CurrentState = PlayerStateController.CharacterStates.RUNNING;
+                currentAnimState = PlayerStateController.CharacterStates.RUNNING;
             }
         }
     }

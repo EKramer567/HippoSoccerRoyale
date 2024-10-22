@@ -9,16 +9,22 @@ public class PlayerStateController : MonoBehaviour
         IDLE,
         WALKING,
         RUNNING,
-        KICKING
+        KICKING,
+        DISABLED
     }
 
-    private CharacterStates currentState;
+    private CharacterStates currentState = CharacterStates.IDLE;
 
-    public static PlayerStateController Instance { get; private set; }
+    //public static PlayerStateController Instance { get; private set; }
 
     public CharacterStates CurrentState
     {
         get { return currentState; }
         set { currentState = value; }
+    }
+
+    void Awake()
+    {
+        currentState = PlayerStateController.CharacterStates.IDLE;
     }
 }
