@@ -23,9 +23,19 @@ public class MarbleManager : MonoBehaviour
     bool spawnTimerActive = false;
     int activeCount;
 
-    // Start is called before the first frame update
-    void Start()
+    public static MarbleManager Instance { get; private set; }
+
+    void Awake()
     {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
         indeciesOfInactiveMarbles = new Queue<int>();
         Physics.gravity = new Vector3(0, -30, 0);
     }
