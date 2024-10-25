@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ScoreZonesManager : MonoBehaviour
 {
@@ -41,9 +42,27 @@ public class ScoreZonesManager : MonoBehaviour
     [SerializeField]
     TMP_Text blNum;
 
+    [SerializeField]
+    Image trPanel;
+    [SerializeField]
+    Image tlPanel;
+    [SerializeField]
+    Image brPanel;
+    [SerializeField]
+    Image blPanel;
+
     [Header("Zones")]
     [SerializeField]
-    string topRightZone, topLeftZone, bottomRightZone, bottomLeftZone;
+    string topRightZone;
+    [SerializeField]
+    string topLeftZone;
+    [SerializeField]
+    string bottomRightZone;
+    [SerializeField]
+    string bottomLeftZone;
+
+    [SerializeField]
+    Color COM_Panel_Color, P1_Panel_Color;
 
     public static ScoreZonesManager Instance { get; private set; }
 
@@ -72,18 +91,22 @@ public class ScoreZonesManager : MonoBehaviour
             case PlayerZoneEnum.TOP_RIGHT:
                 trText.SetText(PLAYER_HEADER);
                 trText.color = Color.red;
+                trPanel.color = P1_Panel_Color;
                 break;
             case PlayerZoneEnum.TOP_LEFT:
                 tlText.SetText(PLAYER_HEADER);
                 tlText.color = Color.red;
+                tlPanel.color = P1_Panel_Color;
                 break;
             case PlayerZoneEnum.BOTTOM_RIGHT:
                 brText.SetText(PLAYER_HEADER);
                 brText.color = Color.red;
+                brPanel.color = P1_Panel_Color;
                 break;
             case PlayerZoneEnum.BOTTOM_LEFT:
                 blText.SetText(PLAYER_HEADER);
                 blText.color = Color.red;
+                blPanel.color = P1_Panel_Color;
                 break;
             default:
                 break;
@@ -144,11 +167,18 @@ public class ScoreZonesManager : MonoBehaviour
     {
         trText.SetText(COM_HEADER);
         trText.color = Color.gray;
+        trPanel.color = COM_Panel_Color;
+
         tlText.SetText(COM_HEADER);
         tlText.color = Color.gray;
+        tlPanel.color = COM_Panel_Color;
+
         brText.SetText(COM_HEADER);
         brText.color = Color.gray;
+        brPanel.color = COM_Panel_Color;
+
         blText.SetText(COM_HEADER);
         blText.color = Color.gray;
+        blPanel.color = COM_Panel_Color;
     }
 }

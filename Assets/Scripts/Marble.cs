@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class Marble : MonoBehaviour
 {
@@ -13,7 +15,7 @@ public class Marble : MonoBehaviour
 
     private void OnEnable()
     {
-        rb.velocity = Vector3.zero;
+        rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
     }
 
@@ -26,11 +28,23 @@ public class Marble : MonoBehaviour
         }
     }
 
-    void OnCollisionEnter(Collision collision)
+    private void OnCollisionEnter(Collision collision)
     {
-        if (LayerMask.LayerToName(collision.gameObject.layer) == "PointZones")
+        if (LayerMask.LayerToName(collision.gameObject.layer) == "Walls")
         {
-            gameObject.SetActive(false);
+            Vector3 dir = Vector3.zero + collision.GetContact(0).normal;
+
+            rb.AddForce(dir * 10, ForceMode.Impulse);
+            //rb.linearVelocity = dir * rb.linearVelocity.magnitude;
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (LayerMask.LayerToName(other.gameObject.layer) == "Water")
+        {
+            Vector3 pos = transform.position;
+            MarbleManager.Instance.PlaySplash(other, pos);
         }
     }
 }

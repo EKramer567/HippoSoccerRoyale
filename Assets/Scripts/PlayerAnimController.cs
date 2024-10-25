@@ -72,7 +72,7 @@ public class PlayerAnimController : MonoBehaviour
         {
             if (!animator.GetCurrentAnimatorStateInfo(0).IsName(kickAnimString))
             {
-                stateController.CurrentState = PlayerStateController.CharacterStates.RUNNING;
+                 stateController.CurrentState = PlayerStateController.CharacterStates.RUNNING;
                 currentAnimState = PlayerStateController.CharacterStates.RUNNING;
             }
         }
