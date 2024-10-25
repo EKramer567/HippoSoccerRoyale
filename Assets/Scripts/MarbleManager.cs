@@ -19,15 +19,42 @@ public class MarbleManager : MonoBehaviour
     [SerializeField]
     int maxNumberActiveMarbles = 5;
 
+    [SerializeField]
+    List<ParticleSystem> splashParticleObjectsList;
+
+    Queue<ParticleSystem> splashParticleObjects;
+
+    [SerializeField]
+    float splashWaitTime = 0.2f;
+
     float spawnDelayTimer = 0;
     bool spawnTimerActive = false;
     int activeCount;
 
-    // Start is called before the first frame update
-    void Start()
+    public static MarbleManager Instance { get; private set; }
+
+    void Awake()
     {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
         indeciesOfInactiveMarbles = new Queue<int>();
+        splashParticleObjects = new Queue<ParticleSystem>();
         Physics.gravity = new Vector3(0, -30, 0);
+    }
+
+    private void Start()
+    {
+        foreach (ParticleSystem p in splashParticleObjectsList)
+        {
+            splashParticleObjects.Enqueue(p);
+        }
     }
 
 
@@ -70,5 +97,28 @@ public class MarbleManager : MonoBehaviour
                 spawnDelayTimer = 0;
             }
         }
+    }
+
+    public void PlaySplash(Collider collide, Vector3 objPosition)
+    {
+        StartCoroutine(WaitForSplash(collide, objPosition));
+    }
+
+    private void SplashEffect(Vector3 location)
+    {
+        ParticleSystem frontEffect = splashParticleObjects.Peek();
+        if (!frontEffect.isPlaying)
+        {
+            splashParticleObjects.Peek().gameObject.SetActive(true);
+            splashParticleObjects.Peek().transform.position = location;
+            splashParticleObjects.Peek().Play();
+            splashParticleObjects.Enqueue(splashParticleObjects.Dequeue());
+        }
+    }
+
+    private IEnumerator WaitForSplash(Collider coll, Vector3 pos)
+    {
+        yield return new WaitForSeconds(splashWaitTime);
+        SplashEffect(coll.ClosestPoint(pos));
     }
 }

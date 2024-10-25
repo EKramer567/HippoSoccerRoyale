@@ -43,6 +43,12 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField]
     LayerMask wallMask;
 
+    [SerializeField]
+    ParticleSystem kickParticles;
+
+    [SerializeField]
+    SphereCollider kickCollider;
+
     public Vector2 MoveInput { get; private set; }
     public bool KickInput { get; private set; }
 
@@ -70,10 +76,7 @@ public class PlayerMovement : MonoBehaviour
         {
             kinematicRigidBody = GetComponent<Rigidbody>();
         }
-        /*if (capCollider == null)
-        {
-            capCollider = GetComponent<CapsuleCollider>();
-        }*/
+
         if (stateController == null)
         {
             stateController = GetComponent<PlayerStateController>();
@@ -153,30 +156,34 @@ public class PlayerMovement : MonoBehaviour
             float distToMove = currentMovement.magnitude;
             while (bounces < 4 && distToMove > Mathf.Epsilon)
             {
+                Vector3 xzHitNormal = new Vector3(hit.normal.x, 0, hit.normal.z).normalized;
                 // move against normal of walls slightly to help prevent getting caught on them
                 float fract = hit.distance / distToMove;
-                Vector3 posToMove = transform.position + (hit.normal * fract);
+                Vector3 posToMove = transform.position + (xzHitNormal * fract);
 
                 distToMove *= (1 - fract);
 
-                float angleBetween = Vector3.Angle(hit.normal, worldDirection);
+                float angleBetween = Vector3.Angle(xzHitNormal, worldDirection);
                 angleBetween = Mathf.Min(maxShoveAngle, Mathf.Abs(angleBetween));
                 float normalizedAngle = angleBetween / maxShoveAngle;
 
                 distToMove *= Mathf.Pow(1 - normalizedAngle, 0.5f) * 0.9f + 0.1f;
 
-                Vector3 proj = Vector3.ProjectOnPlane(posToMove, hit.normal).normalized * distToMove;
+                Vector3 proj = Vector3.ProjectOnPlane(posToMove, xzHitNormal).normalized * distToMove;
 
                 kinematicRigidBody.MovePosition(transform.position + (100 * proj * Time.deltaTime));
 
                 bounces++;
             }
-        }        
+        }
+
+        kickCollider.enabled = kickParticles.isEmitting ? true : false;
 
         if (kickAction.IsPressed() && stateController.CurrentState != PlayerStateController.CharacterStates.KICKING)
         {
             // TODO: do a kick
             stateController.CurrentState = PlayerStateController.CharacterStates.KICKING;
+            kickParticles.Play();
         }
     }
 }
