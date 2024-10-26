@@ -1,4 +1,5 @@
 using JetBrains.Annotations;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -84,7 +85,7 @@ public class ScoreZonesManager : MonoBehaviour
         ResetScores();
         ResetPlayerZone();
 
-        playerZone = (PlayerZoneEnum)Random.Range(0, 3);
+        playerZone = (PlayerZoneEnum)UnityEngine.Random.Range(0, 3);
 
         switch (playerZone)
         {
@@ -125,25 +126,21 @@ public class ScoreZonesManager : MonoBehaviour
         {
             trScoreVal++;
             trNum.SetText(trScoreVal.ToString());
-            Debug.Log(zoneTag + " adds point! Current Score: " + trScoreVal);
         }
         else if (zoneTag == topLeftZone)
         {
             tlScoreVal++;
             tlNum.SetText(tlScoreVal.ToString());
-            Debug.Log(zoneTag + " adds point! Current Score: " + tlScoreVal);
         }
         else if (zoneTag == bottomRightZone)
         {
             brScoreVal++;
             brNum.SetText(brScoreVal.ToString());
-            Debug.Log(zoneTag + " adds point! Current Score: " + brScoreVal);
         }
         else if (zoneTag == bottomLeftZone)
         {
             blScoreVal++;
             blNum.SetText(blScoreVal.ToString());
-            Debug.Log(zoneTag + " adds point! Current Score: " + blScoreVal);
         }
         else 
         {
@@ -180,5 +177,50 @@ public class ScoreZonesManager : MonoBehaviour
         blText.SetText(COM_HEADER);
         blText.color = Color.gray;
         blPanel.color = COM_Panel_Color;
+    }
+
+    /// <summary>
+    /// Sends the highest score on the field to be in the highscores 
+    /// (this game isn't multiplayer so only do this if the player has the highest score)
+    /// </summary>
+    public void GetWinningScore()
+    {
+        int[] tempScoreArr = new int[4];
+        tempScoreArr[0] = trScoreVal;
+        tempScoreArr[1] = tlScoreVal;
+        tempScoreArr[2] = brScoreVal;
+        tempScoreArr[3] = blScoreVal;
+
+        int maxScore = Mathf.Max(tempScoreArr);
+
+        switch (playerZone)
+        {
+            case PlayerZoneEnum.TOP_RIGHT:
+                if (trScoreVal == maxScore)
+                {
+                    PlayerPrefsManager.Instance.SortNewScoreToHighscores(maxScore);
+                }
+                break;
+            case PlayerZoneEnum.TOP_LEFT:
+                if (tlScoreVal == maxScore)
+                {
+                    PlayerPrefsManager.Instance.SortNewScoreToHighscores(maxScore);
+                }
+                break;
+            case PlayerZoneEnum.BOTTOM_RIGHT:
+                if (brScoreVal == maxScore)
+                {
+                    PlayerPrefsManager.Instance.SortNewScoreToHighscores(maxScore);
+                }
+                break;
+            case PlayerZoneEnum.BOTTOM_LEFT:
+                if (blScoreVal == maxScore)
+                {
+                    PlayerPrefsManager.Instance.SortNewScoreToHighscores(maxScore);
+                }
+                break;
+            default:
+                break;
+        }
     }
 }

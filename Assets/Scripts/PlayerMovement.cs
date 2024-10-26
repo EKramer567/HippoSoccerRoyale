@@ -112,6 +112,17 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
+        if (GameStateController.Instance.CurrentGameState != GameStateController.GameStates.PLAYING)
+        {
+            moveAction.Disable();
+            kickAction.Disable();
+        }
+        else
+        {
+            moveAction.Enable();
+            kickAction.Enable();
+        }
+
         moveVal = moveAction.ReadValue<Vector2>();
         Vector3 worldDirection = transform.TransformDirection(moveVal.x, 0, moveVal.y);
         worldDirection.Normalize();
