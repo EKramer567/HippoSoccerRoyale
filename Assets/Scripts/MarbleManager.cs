@@ -90,7 +90,7 @@ public class MarbleManager : MonoBehaviour
             if (spawnDelayTimer >= spawnDelayTime)
             {
                 // random vector to prevent the marbles stacking up on eachother when spawning undisturbed
-                Vector3 rand = new Vector3(Random.Range(0f, 0.5f), 0, Random.Range(0f, 0.5f));
+                Vector3 rand = new Vector3(Random.Range(-10f, 10f), 0, Random.Range(-10f, 10f));
                 marbles[indeciesOfInactiveMarbles.Peek()].transform.position = spawnPoint.transform.position + rand;
                 marbles[indeciesOfInactiveMarbles.Peek()].SetActive(true);
                 indeciesOfInactiveMarbles.Dequeue();

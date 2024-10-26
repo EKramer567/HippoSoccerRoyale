@@ -9,6 +9,9 @@ public class ScoreZone : MonoBehaviour
     // objects on the layer that marbles (and only marbles) exist
     private void OnTriggerEnter(Collider other)
     {
-        ScoreZonesManager.Instance.AddPoint(gameObject.tag);
+        if (GameStateController.Instance.CurrentGameState == GameStateController.GameStates.PLAYING)
+        {
+            ScoreZonesManager.Instance.AddPoint(gameObject.tag);
+        }
     }
 }

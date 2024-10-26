@@ -19,32 +19,22 @@ public class Marble : MonoBehaviour
         rb.angularVelocity = Vector3.zero;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        if (transform.position.y <= -10)
-        {
-            this.gameObject.SetActive(false);
-        }
-    }
-
-    private void OnCollisionEnter(Collision collision)
-    {
-        if (LayerMask.LayerToName(collision.gameObject.layer) == "Walls")
-        {
-            Vector3 dir = Vector3.zero + collision.GetContact(0).normal;
-
-            rb.AddForce(dir * 10, ForceMode.Impulse);
-            //rb.linearVelocity = dir * rb.linearVelocity.magnitude;
-        }
-    }
-
     private void OnTriggerEnter(Collider other)
     {
+        // Play splashing particles when entering water
         if (LayerMask.LayerToName(other.gameObject.layer) == "Water")
         {
             Vector3 pos = transform.position;
             MarbleManager.Instance.PlaySplash(other, pos);
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        // Disable the marble when leaving the box collider for the water
+        if (LayerMask.LayerToName(other.gameObject.layer) == "Water")
+        {
+            this.gameObject.SetActive(false);
         }
     }
 }
