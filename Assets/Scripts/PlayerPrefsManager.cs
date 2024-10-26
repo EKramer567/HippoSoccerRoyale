@@ -5,6 +5,7 @@ struct PlayerScore
 {
     public int score;
     public string playerName;
+    public bool isNewHighscore;
 }
 
 public class PlayerPrefsManager : MonoBehaviour
@@ -63,12 +64,31 @@ public class PlayerPrefsManager : MonoBehaviour
                 {
                     highScoresPairs[j + 1].playerName = highScoresPairs[j].playerName;
                     highScoresPairs[j + 1].score = highScoresPairs[j].score;
+                    highScoresPairs[j + 1].isNewHighscore = false;
                 }
             }
             highScoresPairs[j + 1].playerName = BLANK_PLAYER_SLOT; // *** TODO: Add player input for their name
             highScoresPairs[j + 1].score = newScore;
+            highScoresPairs[j + 1].isNewHighscore = true;
+            SaveHighScorePlayerPrefs();
         }
-        SaveHighScorePlayerPrefs(); // *** TODO move this inside the if statement so we dont have to Save in order to display highscores
+    }
+
+    /// <summary>
+    /// Display the highscores panel with updated placements
+    /// </summary>
+    public void DisplayHighscores()
+    {
+        //PopulateHighscorePairs() to be called beforehand if you just want the pull from playerprefs instead of current
+        for (int i = 0;  i < highScoresPairs.Length; i++)
+        {
+            HighscoresManager.Instance.UpdateHighscoreField(i, highScoresPairs[i].playerName, 
+                highScoresPairs[i].score, highScoresPairs[i].isNewHighscore);
+            if (highScoresPairs[i].isNewHighscore)
+            {
+                highScoresPairs[i].isNewHighscore = false;
+            }
+        }
     }
 
     /// <summary>
@@ -80,10 +100,6 @@ public class PlayerPrefsManager : MonoBehaviour
         {
             PlayerPrefs.SetString(PLAYER_NAME_PREFIX + i.ToString() + INDEX_SUFFIX, highScoresPairs[i].playerName);
             PlayerPrefs.SetInt(HIGHSCORE_PREFIX + i.ToString() + INDEX_SUFFIX, highScoresPairs[i].score);
-
-            // *** TODO write a function in this class that just returns whatever's in playerprefs
-            // in case NONE of the highscores are updated
-            HighscoresManager.Instance.UpdateHighscoreField(i, highScoresPairs[i].playerName, highScoresPairs[i].score);
         }
         PlayerPrefs.Save();
     }
@@ -102,12 +118,14 @@ public class PlayerPrefsManager : MonoBehaviour
                 // Get data from playerprefs to display
                 highScoresPairs[i].playerName = PlayerPrefs.GetString(playerKey);
                 highScoresPairs[i].score = PlayerPrefs.GetInt(scoreKey);
+                highScoresPairs[i].isNewHighscore = false;
             }
             else
             {
                 // Populate with blanks if there arent enough highscores set on the board to fill the slots
                 highScoresPairs[i].playerName = BLANK_PLAYER_SLOT;
                 highScoresPairs[i].score = 0;
+                highScoresPairs[i].isNewHighscore = false;
             }
         }
     }

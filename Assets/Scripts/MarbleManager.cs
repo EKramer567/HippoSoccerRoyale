@@ -99,6 +99,16 @@ public class MarbleManager : MonoBehaviour
         }
     }
 
+    public void DisableAllMarbles()
+    {
+        spawnDelayTimer = 0;
+        foreach (GameObject marb in marbles)
+        {
+            marb.SetActive(false);
+        }
+        Debug.Log("Disabling all marbles on field");
+    }
+
     public void PlaySplash(Collider collide, Vector3 objPosition)
     {
         StartCoroutine(WaitForSplash(collide, objPosition));

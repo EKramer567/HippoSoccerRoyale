@@ -18,8 +18,6 @@ public class ScoreZonesManager : MonoBehaviour
 
     PlayerZoneEnum playerZone;
 
-    int trScoreVal, tlScoreVal, brScoreVal, blScoreVal = 0;
-
     [Header("Score Text Fields")]
     [SerializeField]
     TMP_Text trText;
@@ -65,7 +63,23 @@ public class ScoreZonesManager : MonoBehaviour
     [SerializeField]
     Color COM_Panel_Color, P1_Panel_Color;
 
+    CharacterZonePair[] characterZonePairs = new CharacterZonePair[4];
+
     public static ScoreZonesManager Instance { get; private set; }
+
+    struct CharacterZonePair
+    {
+        public PlayerZoneEnum zone;
+        public int zoneScoreValue;
+        public bool isPlayer;
+
+        public void SetValues(PlayerZoneEnum z, int zoneScoreVal, bool isPlayerCharacter)
+        {
+            zone = z;
+            zoneScoreValue = zoneScoreVal;
+            isPlayer = isPlayerCharacter;
+        }
+    }
 
     void Awake()
     {
@@ -84,34 +98,6 @@ public class ScoreZonesManager : MonoBehaviour
     {
         ResetScores();
         ResetPlayerZone();
-
-        playerZone = (PlayerZoneEnum)UnityEngine.Random.Range(0, 3);
-
-        switch (playerZone)
-        {
-            case PlayerZoneEnum.TOP_RIGHT:
-                trText.SetText(PLAYER_HEADER);
-                trText.color = Color.red;
-                trPanel.color = P1_Panel_Color;
-                break;
-            case PlayerZoneEnum.TOP_LEFT:
-                tlText.SetText(PLAYER_HEADER);
-                tlText.color = Color.red;
-                tlPanel.color = P1_Panel_Color;
-                break;
-            case PlayerZoneEnum.BOTTOM_RIGHT:
-                brText.SetText(PLAYER_HEADER);
-                brText.color = Color.red;
-                brPanel.color = P1_Panel_Color;
-                break;
-            case PlayerZoneEnum.BOTTOM_LEFT:
-                blText.SetText(PLAYER_HEADER);
-                blText.color = Color.red;
-                blPanel.color = P1_Panel_Color;
-                break;
-            default:
-                break;
-        }
     }
 
     // Update is called once per frame
@@ -124,23 +110,23 @@ public class ScoreZonesManager : MonoBehaviour
     {
         if (zoneTag == topRightZone)
         {
-            trScoreVal++;
-            trNum.SetText(trScoreVal.ToString());
+            characterZonePairs[0].zoneScoreValue++;
+            trNum.SetText(characterZonePairs[0].zoneScoreValue.ToString());
         }
         else if (zoneTag == topLeftZone)
         {
-            tlScoreVal++;
-            tlNum.SetText(tlScoreVal.ToString());
+            characterZonePairs[1].zoneScoreValue++;
+            tlNum.SetText(characterZonePairs[1].zoneScoreValue.ToString());
         }
         else if (zoneTag == bottomRightZone)
         {
-            brScoreVal++;
-            brNum.SetText(brScoreVal.ToString());
+            characterZonePairs[2].zoneScoreValue++;
+            brNum.SetText(characterZonePairs[2].zoneScoreValue.ToString());
         }
         else if (zoneTag == bottomLeftZone)
         {
-            blScoreVal++;
-            blNum.SetText(blScoreVal.ToString());
+            characterZonePairs[3].zoneScoreValue++;
+            blNum.SetText(characterZonePairs[3].zoneScoreValue.ToString());
         }
         else 
         {
@@ -150,14 +136,16 @@ public class ScoreZonesManager : MonoBehaviour
 
     public void ResetScores()
     {
-        trScoreVal = 0;
-        tlScoreVal = 0;
-        brScoreVal = 0;
-        blScoreVal = 0;
+        
+        for (int  i = 0; i < characterZonePairs.Length; i++)
+        {
+            characterZonePairs[i].zoneScoreValue = 0;
+        }
         trNum.SetText("0");
-        trNum.SetText("0");
+        tlNum.SetText("0");
         brNum.SetText("0");
         blNum.SetText("0");
+        Debug.Log("Resetting scores");
     }
 
     public void ResetPlayerZone()
@@ -165,18 +153,56 @@ public class ScoreZonesManager : MonoBehaviour
         trText.SetText(COM_HEADER);
         trText.color = Color.gray;
         trPanel.color = COM_Panel_Color;
+        characterZonePairs[0].SetValues(PlayerZoneEnum.TOP_RIGHT, 0, false);
 
         tlText.SetText(COM_HEADER);
         tlText.color = Color.gray;
         tlPanel.color = COM_Panel_Color;
+        characterZonePairs[1].SetValues(PlayerZoneEnum.TOP_LEFT, 0, false);
 
         brText.SetText(COM_HEADER);
         brText.color = Color.gray;
         brPanel.color = COM_Panel_Color;
+        characterZonePairs[2].SetValues(PlayerZoneEnum.BOTTOM_RIGHT, 0, false);
 
         blText.SetText(COM_HEADER);
         blText.color = Color.gray;
         blPanel.color = COM_Panel_Color;
+        characterZonePairs[3].SetValues(PlayerZoneEnum.BOTTOM_LEFT, 0, false);
+
+        playerZone = (PlayerZoneEnum)UnityEngine.Random.Range(0, 3);
+
+        switch (playerZone)
+        {
+            case PlayerZoneEnum.TOP_RIGHT:
+                trText.SetText(PLAYER_HEADER);
+                trText.color = Color.red;
+                trPanel.color = P1_Panel_Color;
+                characterZonePairs[0].isPlayer = true;
+                break;
+            case PlayerZoneEnum.TOP_LEFT:
+                tlText.SetText(PLAYER_HEADER);
+                tlText.color = Color.red;
+                tlPanel.color = P1_Panel_Color;
+                characterZonePairs[1].isPlayer = true;
+                break;
+            case PlayerZoneEnum.BOTTOM_RIGHT:
+                brText.SetText(PLAYER_HEADER);
+                brText.color = Color.red;
+                brPanel.color = P1_Panel_Color;
+                characterZonePairs[2].isPlayer = true;
+                break;
+            case PlayerZoneEnum.BOTTOM_LEFT:
+                blText.SetText(PLAYER_HEADER);
+                blText.color = Color.red;
+                blPanel.color = P1_Panel_Color;
+                characterZonePairs[3].isPlayer = true;
+                break;
+            default:
+                break;
+        }
+
+        Debug.Log("Disabling Highscores Panel");
     }
 
     /// <summary>
@@ -186,41 +212,20 @@ public class ScoreZonesManager : MonoBehaviour
     public void GetWinningScore()
     {
         int[] tempScoreArr = new int[4];
-        tempScoreArr[0] = trScoreVal;
-        tempScoreArr[1] = tlScoreVal;
-        tempScoreArr[2] = brScoreVal;
-        tempScoreArr[3] = blScoreVal;
+        tempScoreArr[0] = characterZonePairs[0].zoneScoreValue;
+        tempScoreArr[1] = characterZonePairs[1].zoneScoreValue;
+        tempScoreArr[2] = characterZonePairs[2].zoneScoreValue;
+        tempScoreArr[3] = characterZonePairs[3].zoneScoreValue;
 
         int maxScore = Mathf.Max(tempScoreArr);
 
-        switch (playerZone)
+        for (int i = 0; i < characterZonePairs.Length; i++)
         {
-            case PlayerZoneEnum.TOP_RIGHT:
-                if (trScoreVal == maxScore)
-                {
-                    PlayerPrefsManager.Instance.SortNewScoreToHighscores(maxScore);
-                }
+            if (characterZonePairs[i].zoneScoreValue >= maxScore && characterZonePairs[i].isPlayer)
+            {
+                PlayerPrefsManager.Instance.SortNewScoreToHighscores(characterZonePairs[i].zoneScoreValue);
                 break;
-            case PlayerZoneEnum.TOP_LEFT:
-                if (tlScoreVal == maxScore)
-                {
-                    PlayerPrefsManager.Instance.SortNewScoreToHighscores(maxScore);
-                }
-                break;
-            case PlayerZoneEnum.BOTTOM_RIGHT:
-                if (brScoreVal == maxScore)
-                {
-                    PlayerPrefsManager.Instance.SortNewScoreToHighscores(maxScore);
-                }
-                break;
-            case PlayerZoneEnum.BOTTOM_LEFT:
-                if (blScoreVal == maxScore)
-                {
-                    PlayerPrefsManager.Instance.SortNewScoreToHighscores(maxScore);
-                }
-                break;
-            default:
-                break;
+            }
         }
     }
 }
