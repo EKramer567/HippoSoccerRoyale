@@ -23,7 +23,9 @@ public class GameStateController : MonoBehaviour
     float timer = 60.0f;
     int seconds = 60;
 
-    UnityEvent gameFinished;
+    UnityEvent gameFinishedEvent;
+
+    UnityEvent gameRestartEvent;
 
     bool gameIsEnded = false;
 
@@ -31,7 +33,7 @@ public class GameStateController : MonoBehaviour
 
     public GameStates CurrentGameState { get { return currentState; } }
 
-    public UnityEvent GameFinished { get { return gameFinished; } }
+    public UnityEvent GameFinishedEvent { get { return gameFinishedEvent; } }
 
     void Awake()
     {
@@ -49,14 +51,23 @@ public class GameStateController : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        if (gameFinished == null)
+        if (gameFinishedEvent == null)
         {
-            gameFinished = new UnityEvent();
+            gameFinishedEvent = new UnityEvent();
+        }
+        if (gameRestartEvent == null)
+        {
+            gameRestartEvent = new UnityEvent();
         }
         timer = newGameStartingTime;
 
-        gameFinished.AddListener(HighscoresManager.Instance.EnableHighscoresPanel);
-        gameFinished.AddListener(ScoreZonesManager.Instance.GetWinningScore);
+        gameFinishedEvent.AddListener(ScoreZonesManager.Instance.GetWinningScore);
+        gameFinishedEvent.AddListener(HighscoresManager.Instance.EnableHighscoresPanel);
+
+        gameRestartEvent.AddListener(HighscoresManager.Instance.DisableHighscoresPanel);
+        gameRestartEvent.AddListener(ScoreZonesManager.Instance.ResetScores);
+        gameRestartEvent.AddListener(ScoreZonesManager.Instance.ResetPlayerZone);
+        gameRestartEvent.AddListener(MarbleManager.Instance.DisableAllMarbles);
     }
 
     // Update is called once per frame
@@ -75,7 +86,7 @@ public class GameStateController : MonoBehaviour
             timerText.SetText(seconds.ToString());
 
             currentState = GameStates.GAME_OVER;
-            gameFinished.Invoke();
+            gameFinishedEvent.Invoke();
         }
     }
 
@@ -84,5 +95,13 @@ public class GameStateController : MonoBehaviour
         timer = newGameStartingTime;
         seconds = 60;
         timerText.SetText(seconds.ToString());
+    }
+
+    public void ResetGameState()
+    {
+        ResetTimer();
+        gameIsEnded = false;
+        currentState = GameStates.PLAYING;
+        gameRestartEvent.Invoke();
     }
 }
