@@ -208,8 +208,9 @@ public class ScoreZonesManager : MonoBehaviour
     /// <summary>
     /// Sends the highest score on the field to be in the highscores 
     /// (this game isn't multiplayer so only do this if the player has the highest score)
+    /// returns true if a new score was set, false if not
     /// </summary>
-    public void GetWinningScore()
+    public int GetWinningScore()
     {
         int[] tempScoreArr = new int[4];
         tempScoreArr[0] = characterZonePairs[0].zoneScoreValue;
@@ -223,9 +224,9 @@ public class ScoreZonesManager : MonoBehaviour
         {
             if (characterZonePairs[i].zoneScoreValue >= maxScore && characterZonePairs[i].isPlayer)
             {
-                PlayerPrefsManager.Instance.SortNewScoreToHighscores(characterZonePairs[i].zoneScoreValue);
-                break;
+                return characterZonePairs[i].zoneScoreValue;
             }
         }
+        return -1;
     }
 }

@@ -23,17 +23,21 @@ public class GameStateController : MonoBehaviour
     float timer = 60.0f;
     int seconds = 60;
 
-    UnityEvent gameFinishedEvent;
+    UnityEvent<int> preGameFinishedEvent;
+
+    UnityEvent<bool> gameFinishedEvent;
 
     UnityEvent gameRestartEvent;
 
     bool gameIsEnded = false;
 
+    bool gameEndPanel = false;
+
     public static GameStateController Instance { get; private set; }
 
     public GameStates CurrentGameState { get { return currentState; } }
 
-    public UnityEvent GameFinishedEvent { get { return gameFinishedEvent; } }
+    public UnityEvent<bool> GameFinishedEvent { get { return gameFinishedEvent; } }
 
     void Awake()
     {
@@ -53,7 +57,11 @@ public class GameStateController : MonoBehaviour
     {
         if (gameFinishedEvent == null)
         {
-            gameFinishedEvent = new UnityEvent();
+            gameFinishedEvent = new UnityEvent<bool>();
+        }
+        if (preGameFinishedEvent == null)
+        {
+            preGameFinishedEvent = new UnityEvent<int>();
         }
         if (gameRestartEvent == null)
         {
@@ -61,10 +69,13 @@ public class GameStateController : MonoBehaviour
         }
         timer = newGameStartingTime;
 
-        gameFinishedEvent.AddListener(ScoreZonesManager.Instance.GetWinningScore);
+        preGameFinishedEvent.AddListener(GetEndingPanel);
+        preGameFinishedEvent.AddListener(HighscoresManager.Instance.GetNewScore);
+
         gameFinishedEvent.AddListener(HighscoresManager.Instance.EnableHighscoresPanel);
 
         gameRestartEvent.AddListener(HighscoresManager.Instance.DisableHighscoresPanel);
+        gameRestartEvent.AddListener(HighscoresManager.Instance.DisableInputPanel);
         gameRestartEvent.AddListener(ScoreZonesManager.Instance.ResetScores);
         gameRestartEvent.AddListener(ScoreZonesManager.Instance.ResetPlayerZone);
         gameRestartEvent.AddListener(MarbleManager.Instance.DisableAllMarbles);
@@ -86,7 +97,8 @@ public class GameStateController : MonoBehaviour
             timerText.SetText(seconds.ToString());
 
             currentState = GameStates.GAME_OVER;
-            gameFinishedEvent.Invoke();
+            preGameFinishedEvent.Invoke(ScoreZonesManager.Instance.GetWinningScore());
+            gameFinishedEvent.Invoke(gameEndPanel);
         }
     }
 
@@ -103,5 +115,11 @@ public class GameStateController : MonoBehaviour
         gameIsEnded = false;
         currentState = GameStates.PLAYING;
         gameRestartEvent.Invoke();
+    }
+
+    public void GetEndingPanel(int winningScore)
+    {
+        // true if new highscore was made (greater than -1), false if not. Changes if the input panel or highscore panel displays on begin of game end
+        gameEndPanel = (ScoreZonesManager.Instance.GetWinningScore() > 0);
     }
 }
