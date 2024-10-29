@@ -1,4 +1,5 @@
 using System.Linq;
+using TMPro;
 using UnityEngine;
 
 struct PlayerScore
@@ -10,6 +11,9 @@ struct PlayerScore
 
 public class PlayerPrefsManager : MonoBehaviour
 {
+    string inputName;
+    int newHighscore;
+
     const int NUM_SCORES_TO_KEEP = 10;
 
     const string HIGHSCORE_PREFIX = "HS_";
@@ -67,8 +71,8 @@ public class PlayerPrefsManager : MonoBehaviour
                     highScoresPairs[j + 1].isNewHighscore = false;
                 }
             }
-            highScoresPairs[j + 1].playerName = BLANK_PLAYER_SLOT; // *** TODO: Add player input for their name
-            highScoresPairs[j + 1].score = newScore;
+            highScoresPairs[j + 1].playerName = inputName; // *** TODO: Add player input for their name
+            highScoresPairs[j + 1].score = newHighscore;
             highScoresPairs[j + 1].isNewHighscore = true;
             SaveHighScorePlayerPrefs();
         }
@@ -128,5 +132,12 @@ public class PlayerPrefsManager : MonoBehaviour
                 highScoresPairs[i].isNewHighscore = false;
             }
         }
+    }
+
+    public void InputNewPlayerHighscore(string newPlayerName, int newScore)
+    {
+        inputName = newPlayerName;
+        newHighscore = newScore;
+        SortNewScoreToHighscores(newHighscore);
     }
 }
