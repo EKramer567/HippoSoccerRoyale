@@ -20,7 +20,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: T_Hippo
+  m_Name: T_Hippo 1
   m_Shader: {fileID: -6465566751694194690, guid: 4acd2adc1c0ab324f9246f7debbd23b1, type: 3}
   m_Parent: {fileID: 2100000, guid: ec04d1018ba2cce4c9e7ca76d4345a88, type: 2}
   m_ModifiedSerializedProperties: 0
@@ -42,5 +42,6 @@ Material:
     m_Floats: []
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 0}
+    - _HippoColor: {r: 0.5424528, g: 0.5746704, b: 1, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
