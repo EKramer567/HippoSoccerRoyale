@@ -56,7 +56,7 @@ public class PlayerPrefsManager : MonoBehaviour
     /// Sort a new highscore entry into the existing scores
     /// </summary>
     /// <param name="newScore"></param>
-    public void SortNewScoreToHighscores(int newScore) // *** TODO: add out string newName for player input
+    public void SortNewScoreToHighscores(int newScore)
     {
         // sort the new score into the array if we have at least one score to replace
         if (highScoresPairs.Last().score < newScore)
@@ -71,7 +71,7 @@ public class PlayerPrefsManager : MonoBehaviour
                     highScoresPairs[j + 1].isNewHighscore = false;
                 }
             }
-            highScoresPairs[j + 1].playerName = inputName; // *** TODO: Add player input for their name
+            highScoresPairs[j + 1].playerName = inputName;
             highScoresPairs[j + 1].score = newHighscore;
             highScoresPairs[j + 1].isNewHighscore = true;
             SaveHighScorePlayerPrefs();

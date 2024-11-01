@@ -31,6 +31,8 @@ public class MarbleManager : MonoBehaviour
     bool spawnTimerActive = false;
     int activeCount;
 
+    public List<GameObject> SceneMarbles { get { return marbles; } }
+
     public static MarbleManager Instance { get; private set; }
 
     void Awake()
