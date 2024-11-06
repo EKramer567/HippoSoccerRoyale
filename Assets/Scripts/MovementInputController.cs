@@ -15,6 +15,8 @@ public class MovementInputController : MonoBehaviour
     private string moveString = "Movement";
     private string kickString = "Kick";
 
+    private Vector3 zoneLocation;
+
     protected virtual string ActionMapName
     {
         get { return actionMapName; }
@@ -39,12 +41,17 @@ public class MovementInputController : MonoBehaviour
 
     public Vector2 MovementValue { get { return moveVal; } }
 
-    /*private void Awake()
+    public Vector3 ZoneLocation
     {
-        moveAction = actionAsset.FindActionMap(actionMapName).FindAction(moveString);
-        kickAction = actionAsset.FindActionMap(actionMapName).FindAction(kickString);
-        RegisterInputActions();
-    }*/
+        get
+        { 
+            return zoneLocation; 
+        }
+        set
+        { 
+            zoneLocation = value;
+        }
+    }
 
     public void EnableActions()
     {

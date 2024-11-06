@@ -11,8 +11,8 @@ public class COM_MovementInputController : MovementInputController
     List<GameObject> targetMarbles;
 
     Vector2 direction;
-
     Vector3 target;
+    Vector3 interceptTargetLocation;
 
     bool startNewScan = true;
 
@@ -21,8 +21,6 @@ public class COM_MovementInputController : MovementInputController
     const float CHECK_INTERVAL = 0.1f;
 
     const float DISTANCE_FROM_TARGET_BUFFER = 2.0f;
-
-    Gamepad COM_gamePad;
 
     private void Awake()
     {
@@ -33,10 +31,9 @@ public class COM_MovementInputController : MovementInputController
     }
 
     void Start()
-    {
-        COM_gamePad = InputSystem.AddDevice<Gamepad>();
-        
+    {        
         targetMarbles = MarbleManager.Instance.SceneMarbles;
+
     }
 
     private void FixedUpdate()
@@ -69,7 +66,7 @@ public class COM_MovementInputController : MovementInputController
         else
         {
             //moveVal
-            fakeInputValue= Vector2.zero;
+            fakeInputValue = Vector2.zero;
         }
 
         moveVal = fakeInputValue;
@@ -120,8 +117,8 @@ public class COM_MovementInputController : MovementInputController
         }
         if (!closestSet)
         {
-            closestPosition = Vector3.zero;
-            Debug.Log("00000 Setting target to mid-arena");
+            closestPosition = ZoneLocation;
+            Debug.Log("00000 Setting target to default");
         }
 
         return closestPosition;

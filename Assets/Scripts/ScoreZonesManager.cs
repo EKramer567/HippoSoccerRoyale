@@ -7,10 +7,11 @@ using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
+using ZonesEnums;
 
-public class ScoreZonesManager : MonoBehaviour
+namespace ZonesEnums
 {
-    enum PlayerZoneEnum
+    public enum PlayerZoneEnum
     {
         TOP_RIGHT,
         TOP_LEFT,
@@ -26,7 +27,9 @@ public class ScoreZonesManager : MonoBehaviour
         COM_2,
         COM_3
     }
-
+}
+public class ScoreZonesManager : MonoBehaviour
+{
     [Header("Score Identifier Text Fields")]
     [SerializeField]
     List<TMP_Text> playerIdentifierTextFields;
@@ -59,6 +62,7 @@ public class ScoreZonesManager : MonoBehaviour
 
     public static ScoreZonesManager Instance { get; private set; }
 
+
     /// <summary>
     /// A struct to hold the data of which player's zone is where and what score value it has
     /// </summary>
@@ -69,6 +73,7 @@ public class ScoreZonesManager : MonoBehaviour
         int zoneScoreValue;
         Score_UI_Element UI_Elements;
 
+        public PlayerZoneEnum Zone { get { return zone; } }
         public PlayerIdentity Identifier { get { return id; } }
         public int ScoreValue { get { return zoneScoreValue; } }
 
@@ -220,8 +225,9 @@ public class ScoreZonesManager : MonoBehaviour
             
             characterZoneRelations[i].SetValues((PlayerZoneEnum)i, randomIDs[i], UI_ElementSections[i]);
             Set_UI_Colors(randomIDs[i], UI_ElementSections[i]);
+            PlayerManager.Instance.SetPlayerZoneAssignment(i, characterZoneRelations[i].Zone);
+            PlayerManager.Instance.SetPlayerPosition(i, characterZoneRelations[i].Zone);
         }
-
         Debug.Log("Disabling Highscores Panel");
     }
 

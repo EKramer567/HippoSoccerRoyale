@@ -1,4 +1,5 @@
 using UnityEngine;
+using ZonesEnums;
 
 public class HippoMovementController : MonoBehaviour
 {
@@ -34,6 +35,10 @@ public class HippoMovementController : MonoBehaviour
 
     MovementInputController movementInputCtrl;
 
+    PlayerZoneEnum thisPlayerZone;
+
+    public PlayerZoneEnum ThisPlayerZone {  get { return thisPlayerZone; } }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -53,6 +58,9 @@ public class HippoMovementController : MonoBehaviour
         }
 
         stateController.CurrentState = PlayerStateController.CharacterStates.IDLE;
+
+        // look at the center of the arena
+        visualModel.rotation = Quaternion.LookRotation(ArenaLocations.Instance.CenterLocation - visualModel.position, visualModel.up);
     }
 
     private void FixedUpdate()
@@ -146,5 +154,10 @@ public class HippoMovementController : MonoBehaviour
             stateController.CurrentState = PlayerStateController.CharacterStates.KICKING;
             kickParticles.Play();
         }
+    }
+
+    public void AssignPlayerZone(PlayerZoneEnum zone)
+    {
+        thisPlayerZone = zone;
     }
 }
