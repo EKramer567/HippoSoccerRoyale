@@ -1495,8 +1495,8 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1715133746}
   - {fileID: 1083353172}
+  - {fileID: 1715133746}
   - {fileID: 2031441047}
   - {fileID: 410885167}
   - {fileID: 1143690980}
@@ -7234,24 +7234,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d121580fb2b9f3f448c4017cc85a811a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  trText: {fileID: 2067287245}
-  tlText: {fileID: 738949702}
-  brText: {fileID: 780404173}
-  blText: {fileID: 459955685}
-  trNum: {fileID: 1521124430}
-  tlNum: {fileID: 367800872}
-  brNum: {fileID: 1765866261}
-  blNum: {fileID: 357480670}
-  trPanel: {fileID: 1083353173}
-  tlPanel: {fileID: 1715133747}
-  brPanel: {fileID: 2031441048}
-  blPanel: {fileID: 410885168}
-  topRightZone: PointZone Top Right
-  topLeftZone: PointZone Top Left
-  bottomRightZone: PointZone Bottom Right
-  bottomLeftZone: PointZone Bottom Left
-  COM_Panel_Color: {r: 0, g: 0, b: 0, a: 0.78431374}
+  playerIdentifierTextFields:
+  - {fileID: 2067287245}
+  - {fileID: 738949702}
+  - {fileID: 780404173}
+  - {fileID: 459955685}
+  scoreNumFields:
+  - {fileID: 1521124430}
+  - {fileID: 367800872}
+  - {fileID: 1765866261}
+  - {fileID: 357480670}
+  scoreNumPanels:
+  - {fileID: 1083353173}
+  - {fileID: 1715133747}
+  - {fileID: 2031441048}
+  - {fileID: 410885168}
+  zoneTagStrings:
+  - PointZone Top Right
+  - PointZone Top Left
+  - PointZone Bottom Right
+  - PointZone Bottom Left
   P1_Panel_Color: {r: 1, g: 0, b: 0, a: 0.8627451}
+  COM_1_Panel_Color: {r: 0.22432362, g: 0.45730847, b: 0.6698113, a: 0.8235294}
+  COM_2_Panel_Color: {r: 0.6037736, g: 0.58458644, b: 0.259167, a: 0.8235294}
+  COM_3_Panel_Color: {r: 0.22582376, g: 0.5849056, b: 0.20692417, a: 0.8235294}
 --- !u!1 &1143690979
 GameObject:
   m_ObjectHideFlags: 0

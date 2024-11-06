@@ -77,7 +77,7 @@ public class GameStateController : MonoBehaviour
         gameRestartEvent.AddListener(HighscoresManager.Instance.DisableHighscoresPanel);
         gameRestartEvent.AddListener(HighscoresManager.Instance.DisableInputPanel);
         gameRestartEvent.AddListener(ScoreZonesManager.Instance.ResetScores);
-        gameRestartEvent.AddListener(ScoreZonesManager.Instance.ResetPlayerZone);
+        gameRestartEvent.AddListener(ScoreZonesManager.Instance.ResetPlayerZones);
         gameRestartEvent.AddListener(MarbleManager.Instance.DisableAllMarbles);
     }
 
