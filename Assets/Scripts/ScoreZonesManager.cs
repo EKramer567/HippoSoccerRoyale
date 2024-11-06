@@ -2,7 +2,9 @@ using JetBrains.Annotations;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -16,68 +18,116 @@ public class ScoreZonesManager : MonoBehaviour
         BOTTOM_LEFT
     }
 
-    PlayerZoneEnum playerZone;
+    enum PlayerIdentity
+    {
+        NONE,
+        PLAYER,
+        COM_1,
+        COM_2,
+        COM_3
+    }
 
-    [Header("Score Text Fields")]
+    [Header("Score Identifier Text Fields")]
     [SerializeField]
-    TMP_Text trText;
-    [SerializeField]
-    TMP_Text tlText;
-    [SerializeField]
-    TMP_Text brText;
-    [SerializeField]
-    TMP_Text blText;
+    List<TMP_Text> playerIdentifierTextFields;
 
     const string PLAYER_HEADER = "P1";
     const string COM_HEADER = "COM";
 
-    [Header("Score Number Fields")]
+    [Header("Score Number Fields (tr, tl, br, bl in order), max of 4 entries")]
     [SerializeField]
-    TMP_Text trNum;
-    [SerializeField]
-    TMP_Text tlNum;
-    [SerializeField]
-    TMP_Text brNum;
-    [SerializeField]
-    TMP_Text blNum;
+    List<TMP_Text> scoreNumFields;
 
+    [Header("Score UI Panels (tr, tl, br, bl in order), max of 4 entries")]
     [SerializeField]
-    Image trPanel;
-    [SerializeField]
-    Image tlPanel;
-    [SerializeField]
-    Image brPanel;
-    [SerializeField]
-    Image blPanel;
+    List<Image> scoreNumPanels;
 
-    [Header("Zones")]
+    [Header("Zone Tag Strings (tr, tl, br, bl in order), max of 4 entries")]
     [SerializeField]
-    string topRightZone;
-    [SerializeField]
-    string topLeftZone;
-    [SerializeField]
-    string bottomRightZone;
-    [SerializeField]
-    string bottomLeftZone;
+    List<string> zoneTagStrings;
 
+    [Header("Panel Colors")]
     [SerializeField]
-    Color COM_Panel_Color, P1_Panel_Color;
+    Color P1_Panel_Color;
+    [SerializeField]
+    Color COM_1_Panel_Color, COM_2_Panel_Color, COM_3_Panel_Color;
 
-    CharacterZonePair[] characterZonePairs = new CharacterZonePair[4];
+    CharacterZoneData[] characterZoneRelations = new CharacterZoneData[4];
+    Score_UI_Element[] UI_ElementSections = new Score_UI_Element[4];
+
+    Dictionary<string, int> tagToZoneIndex;
 
     public static ScoreZonesManager Instance { get; private set; }
 
-    struct CharacterZonePair
+    /// <summary>
+    /// A struct to hold the data of which player's zone is where and what score value it has
+    /// </summary>
+    struct CharacterZoneData
     {
-        public PlayerZoneEnum zone;
-        public int zoneScoreValue;
-        public bool isPlayer;
+        PlayerZoneEnum zone;
+        PlayerIdentity id;
+        int zoneScoreValue;
+        Score_UI_Element UI_Elements;
 
-        public void SetValues(PlayerZoneEnum z, int zoneScoreVal, bool isPlayerCharacter)
+        public PlayerIdentity Identifier { get { return id; } }
+        public int ScoreValue { get { return zoneScoreValue; } }
+
+        public void SetValues(PlayerZoneEnum z, PlayerIdentity identity, Score_UI_Element uiELementSection)
         {
             zone = z;
-            zoneScoreValue = zoneScoreVal;
-            isPlayer = isPlayerCharacter;
+            id = identity;
+            UI_Elements = uiELementSection;
+        }
+
+        public void IncrementScore()
+        {
+            zoneScoreValue++;
+            UI_Elements.SetScoreText(zoneScoreValue.ToString());
+        }
+
+        public void ResetScore()
+        {
+            zoneScoreValue = 0;
+            UI_Elements.SetScoreText(zoneScoreValue.ToString());
+        }
+
+        public void Set_UI_Colors(Color identifierColor, Color scoreNumColor, Color panelColor)
+        {
+            UI_Elements.Set_UI_Section_Colors(identifierColor, scoreNumColor, panelColor);
+        }
+    }
+
+    /// <summary>
+    /// A struct to try to organize all the UI elements to be coordinated and in one place for each section of the UI
+    /// </summary>
+    struct Score_UI_Element
+    {
+        TMP_Text identifierText;
+        TMP_Text scoreText;
+        Image panel;
+
+        public void Set_UI_Section(TMP_Text idText, TMP_Text scoreNumText, Image panelImg)
+        {
+            identifierText = idText;
+            scoreText = scoreNumText;
+            panel = panelImg;
+        }
+
+        public void Set_UI_Section_Colors(Color idTextColor, Color scoreNumColor, Color panelColor)
+        {
+            identifierText.color = idTextColor;
+            scoreText.color = scoreNumColor;
+            panel.color = panelColor;
+        }
+
+        public void SetScoreText(string text)
+        {
+            scoreText.SetText(text);
+        }
+
+        public void SetIdentifierText(string text)
+        {
+            identifierText.SetText(text);
         }
     }
 
@@ -94,10 +144,30 @@ public class ScoreZonesManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Initialize score values and randomize player zones
+    /// </summary>
     private void Start()
     {
+        tagToZoneIndex = new Dictionary<string, int>();
+        // The amount of EVERYTHING here should always be 4
+        try
+        {
+            for (int i = 0; i < zoneTagStrings.Count; i++)
+            {
+                tagToZoneIndex.Add(zoneTagStrings[i], i);
+                UI_ElementSections[i].Set_UI_Section(playerIdentifierTextFields[i], scoreNumFields[i], scoreNumPanels[i]);
+            }
+        }
+        catch (IndexOutOfRangeException e)
+        {
+            Debug.LogError("ERROR! : The list of zone tags, identifier text fields, score num fields, or score panel fields is not size 4");
+            Console.WriteLine(e.Message);
+            throw new ArgumentException("Index parameter is out of range.", e);
+        }
+
+        ResetPlayerZones();
         ResetScores();
-        ResetPlayerZone();
     }
 
     // Update is called once per frame
@@ -106,103 +176,80 @@ public class ScoreZonesManager : MonoBehaviour
         
     }
 
+    /// <summary>
+    /// Increment the score by 1. To be called in OnTriggerEnter of a score zone
+    /// </summary>
+    /// <param name="zoneTag">The tag of the zone collision</param>
     public void AddPoint(string zoneTag)
     {
-        if (zoneTag == topRightZone)
-        {
-            characterZonePairs[0].zoneScoreValue++;
-            trNum.SetText(characterZonePairs[0].zoneScoreValue.ToString());
-        }
-        else if (zoneTag == topLeftZone)
-        {
-            characterZonePairs[1].zoneScoreValue++;
-            tlNum.SetText(characterZonePairs[1].zoneScoreValue.ToString());
-        }
-        else if (zoneTag == bottomRightZone)
-        {
-            characterZonePairs[2].zoneScoreValue++;
-            brNum.SetText(characterZonePairs[2].zoneScoreValue.ToString());
-        }
-        else if (zoneTag == bottomLeftZone)
-        {
-            characterZonePairs[3].zoneScoreValue++;
-            blNum.SetText(characterZonePairs[3].zoneScoreValue.ToString());
-        }
-        else 
-        {
-            Debug.LogError("Invalid zone was hit when attempting score trigger. Tag = " + zoneTag);
-        }
+        characterZoneRelations[tagToZoneIndex[zoneTag]].IncrementScore();
     }
 
+    /// <summary>
+    /// Zero out all score values
+    /// </summary>
     public void ResetScores()
     {
-        
-        for (int  i = 0; i < characterZonePairs.Length; i++)
+        for (int  i = 0; i < characterZoneRelations.Length; i++)
         {
-            characterZonePairs[i].zoneScoreValue = 0;
+            characterZoneRelations[i].ResetScore();
         }
-        trNum.SetText("0");
-        tlNum.SetText("0");
-        brNum.SetText("0");
-        blNum.SetText("0");
-        Debug.Log("Resetting scores");
+        Debug.Log("Scores have been reset");
     }
 
-    public void ResetPlayerZone()
+    /// <summary>
+    /// Resets and re-randomizes the zones that each player is assigned to
+    /// </summary>
+    public void ResetPlayerZones()
     {
-        trText.SetText(COM_HEADER);
-        trText.color = Color.gray;
-        trPanel.color = COM_Panel_Color;
-        characterZonePairs[0].SetValues(PlayerZoneEnum.TOP_RIGHT, 0, false);
+        // set all zone assignments randomly
+        List<PlayerIdentity> randomIDs = new List<PlayerIdentity> { PlayerIdentity.PLAYER, PlayerIdentity.COM_1, PlayerIdentity.COM_2, PlayerIdentity.COM_3 };
+        randomIDs = randomIDs.OrderBy(i => Guid.NewGuid()).ToList();
 
-        tlText.SetText(COM_HEADER);
-        tlText.color = Color.gray;
-        tlPanel.color = COM_Panel_Color;
-        characterZonePairs[1].SetValues(PlayerZoneEnum.TOP_LEFT, 0, false);
-
-        brText.SetText(COM_HEADER);
-        brText.color = Color.gray;
-        brPanel.color = COM_Panel_Color;
-        characterZonePairs[2].SetValues(PlayerZoneEnum.BOTTOM_RIGHT, 0, false);
-
-        blText.SetText(COM_HEADER);
-        blText.color = Color.gray;
-        blPanel.color = COM_Panel_Color;
-        characterZonePairs[3].SetValues(PlayerZoneEnum.BOTTOM_LEFT, 0, false);
-
-        playerZone = (PlayerZoneEnum)UnityEngine.Random.Range(0, 3);
-
-        switch (playerZone)
+        // populate player and COM players to their random zones and change colors accordingly
+        for (int i = 0; i < characterZoneRelations.Length; i++)
         {
-            case PlayerZoneEnum.TOP_RIGHT:
-                trText.SetText(PLAYER_HEADER);
-                trText.color = Color.red;
-                trPanel.color = P1_Panel_Color;
-                characterZonePairs[0].isPlayer = true;
-                break;
-            case PlayerZoneEnum.TOP_LEFT:
-                tlText.SetText(PLAYER_HEADER);
-                tlText.color = Color.red;
-                tlPanel.color = P1_Panel_Color;
-                characterZonePairs[1].isPlayer = true;
-                break;
-            case PlayerZoneEnum.BOTTOM_RIGHT:
-                brText.SetText(PLAYER_HEADER);
-                brText.color = Color.red;
-                brPanel.color = P1_Panel_Color;
-                characterZonePairs[2].isPlayer = true;
-                break;
-            case PlayerZoneEnum.BOTTOM_LEFT:
-                blText.SetText(PLAYER_HEADER);
-                blText.color = Color.red;
-                blPanel.color = P1_Panel_Color;
-                characterZonePairs[3].isPlayer = true;
-                break;
-            default:
-                break;
+            if (randomIDs[i] == PlayerIdentity.PLAYER)
+            {
+                UI_ElementSections[i].SetIdentifierText(PLAYER_HEADER);
+            }
+            else
+            {
+                UI_ElementSections[i].SetIdentifierText(COM_HEADER);
+            }
+            
+            characterZoneRelations[i].SetValues((PlayerZoneEnum)i, randomIDs[i], UI_ElementSections[i]);
+            Set_UI_Colors(randomIDs[i], UI_ElementSections[i]);
         }
 
         Debug.Log("Disabling Highscores Panel");
+    }
+
+    /// <summary>
+    /// Set UI Colors for panels and score text
+    /// </summary>
+    /// <param name="identity">The identity of the player whose panel section we're changing</param>
+    /// <param name="uiElement">Reference to collection of UI elements for this section</param>
+    void Set_UI_Colors(PlayerIdentity identity, Score_UI_Element uiElement)
+    {
+        switch (identity)
+        {
+            case PlayerIdentity.PLAYER:
+                uiElement.Set_UI_Section_Colors(P1_Panel_Color.WithAlpha(1.0f), P1_Panel_Color.WithAlpha(255.0f), P1_Panel_Color);
+                break;
+            case PlayerIdentity.COM_1:
+                uiElement.Set_UI_Section_Colors(COM_1_Panel_Color.WithAlpha(1.0f), COM_1_Panel_Color.WithAlpha(255.0f), COM_1_Panel_Color);
+                break;
+            case PlayerIdentity.COM_2:
+                uiElement.Set_UI_Section_Colors(COM_2_Panel_Color.WithAlpha(1.0f), COM_2_Panel_Color.WithAlpha(255.0f), COM_2_Panel_Color);
+                break;
+            case PlayerIdentity.COM_3:
+                uiElement.Set_UI_Section_Colors(COM_3_Panel_Color.WithAlpha(1.0f), COM_3_Panel_Color.WithAlpha(255.0f), COM_3_Panel_Color);
+                break;
+            default:
+                uiElement.Set_UI_Section_Colors(Color.gray, Color.gray, Color.gray.WithAlpha(210.0f));
+                break;
+        }
     }
 
     /// <summary>
@@ -213,18 +260,19 @@ public class ScoreZonesManager : MonoBehaviour
     public int GetWinningScore()
     {
         int[] tempScoreArr = new int[4];
-        tempScoreArr[0] = characterZonePairs[0].zoneScoreValue;
-        tempScoreArr[1] = characterZonePairs[1].zoneScoreValue;
-        tempScoreArr[2] = characterZonePairs[2].zoneScoreValue;
-        tempScoreArr[3] = characterZonePairs[3].zoneScoreValue;
+
+        for (int i = 0; i < tempScoreArr.Length; i++)
+        {
+            tempScoreArr[i] = characterZoneRelations[i].ScoreValue;
+        }
 
         int maxScore = Mathf.Max(tempScoreArr);
 
-        for (int i = 0; i < characterZonePairs.Length; i++)
+        for (int i = 0; i < characterZoneRelations.Length; i++)
         {
-            if (characterZonePairs[i].zoneScoreValue >= maxScore && characterZonePairs[i].isPlayer)
+            if (characterZoneRelations[i].ScoreValue >= maxScore && characterZoneRelations[i].Identifier == PlayerIdentity.PLAYER)
             {
-                return characterZonePairs[i].zoneScoreValue;
+                return characterZoneRelations[i].ScoreValue;
             }
         }
         return -1;

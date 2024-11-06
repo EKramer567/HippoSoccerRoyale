@@ -109,7 +109,6 @@ public class COM_MovementInputController : MovementInputController
             //float dist = (targetMarbles[i].transform.position - transform.position).sqrMagnitude;
 
             // only go after marbles that are active and aren't currently in the air
-            // TODO : FIX THIS and also PREVENT GOING AFTER INACTIVE MARBLES
             if (dist < minDist && targetMarbles[i].activeInHierarchy 
                 && Mathf.Abs(targetMarbles[i].transform.position.y - transform.position.y) < DISTANCE_FROM_TARGET_BUFFER)
             {
