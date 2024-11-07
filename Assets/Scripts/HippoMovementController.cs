@@ -33,7 +33,7 @@ public class HippoMovementController : MonoBehaviour
 
     PlayerStateController stateController;
 
-    MovementInputController movementInputCtrl;
+    InputControllerData movementInputCtrl;
 
     PlayerZoneEnum thisPlayerZone;
 
@@ -54,13 +54,10 @@ public class HippoMovementController : MonoBehaviour
 
         if (movementInputCtrl == null)
         {
-            movementInputCtrl = GetComponent<MovementInputController>();
+            movementInputCtrl = GetComponent<InputControllerData>();
         }
 
         stateController.CurrentState = PlayerStateController.CharacterStates.IDLE;
-
-        // look at the center of the arena
-        visualModel.rotation = Quaternion.LookRotation(ArenaLocations.Instance.CenterLocation - visualModel.position, visualModel.up);
     }
 
     private void FixedUpdate()
@@ -73,6 +70,7 @@ public class HippoMovementController : MonoBehaviour
     /// </summary>
     protected void HippoMovement()
     {
+        Debug.DrawLine(ArenaLocations.Instance.CenterLocation, visualModel.position, Color.black);
         Vector2 moveVal = movementInputCtrl.MovementValue;
         if (GameStateController.Instance.CurrentGameState != GameStateController.GameStates.PLAYING)
         {
@@ -156,8 +154,22 @@ public class HippoMovementController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Assign this player the zone they're supposed to be scoring in this round
+    /// </summary>
+    /// <param name="zone">Zone assignment</param>
     public void AssignPlayerZone(PlayerZoneEnum zone)
     {
         thisPlayerZone = zone;
+        //Debug.Log("Assigning Player Zones - " + this.name + " is assigned " + thisPlayerZone.ToString());
+    }
+
+    /// <summary>
+    /// Point this player toward the center of the arena
+    /// To be called on start/reset of game
+    /// </summary>
+    public void PointPlayerToCenter()
+    {
+        visualModel.transform.LookAt(ArenaLocations.Instance.CenterLocation, Vector3.up);
     }
 }

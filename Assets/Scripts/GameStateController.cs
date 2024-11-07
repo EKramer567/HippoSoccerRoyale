@@ -3,6 +3,9 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 
+/// <summary>
+/// Class to handle the game states and call functions on game state change
+/// </summary>
 public class GameStateController : MonoBehaviour
 {
     [SerializeField]

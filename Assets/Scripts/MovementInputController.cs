@@ -1,13 +1,12 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class MovementInputController : MonoBehaviour
+public class MovementInputController : InputControllerData
 {
     [Header("Input Action Asset")]
     [SerializeField]
     protected private InputActionAsset actionAsset;
 
-    protected Vector2 moveVal;
     protected InputAction moveAction;
     protected InputAction kickAction;
 
@@ -15,45 +14,47 @@ public class MovementInputController : MonoBehaviour
     private string moveString = "Movement";
     private string kickString = "Kick";
 
-    private Vector3 zoneLocation;
-
+    /// <summary>
+    /// This player's action map name
+    /// </summary>
     protected virtual string ActionMapName
     {
         get { return actionMapName; }
         set { actionMapName = value; }
     }
 
+    /// <summary>
+    /// String to represent the action for movement
+    /// </summary>
     protected virtual string MoveString
     {
         get { return moveString; }
         set { moveString = value; }
     }
 
+    /// <summary>
+    /// String to represent the action for kicking
+    /// </summary>
     protected virtual string KickString
     {
         get { return kickString; }
         set { kickString = value; }
     }
 
-
+    /// <summary>
+    /// Property that captures the player's movement input (WASD, left control stick, etc)
+    /// </summary>
     public Vector2 MoveInput { get; private set; }
+
+    /// <summary>
+    /// Property that captures the player's input for the kick action (space, south button, etc)
+    /// </summary>
     public bool KickInput { get; private set; }
 
-    public Vector2 MovementValue { get { return moveVal; } }
-
-    public Vector3 ZoneLocation
-    {
-        get
-        { 
-            return zoneLocation; 
-        }
-        set
-        { 
-            zoneLocation = value;
-        }
-    }
-
-    public void EnableActions()
+    /// <summary>
+    /// Enable input actions
+    /// </summary>
+    public override void EnableActions()
     {
         if (!moveAction.enabled)
         {
@@ -62,7 +63,10 @@ public class MovementInputController : MonoBehaviour
         }
     }
 
-    public void DisableActions()
+    /// <summary>
+    /// Disable input actions
+    /// </summary>
+    public override void DisableActions()
     {
         if (moveAction.enabled)
         {
@@ -71,11 +75,18 @@ public class MovementInputController : MonoBehaviour
         }
     }
 
-    public bool GetKickActionPressed()
+    /// <summary>
+    /// Get whether the player is kicking
+    /// </summary>
+    /// <returns>Whether the kick action should be performed</returns>
+    public override bool GetKickActionPressed()
     {
         return kickAction.IsPressed();
     }
 
+    /// <summary>
+    /// Register the actions to read correctly
+    /// </summary>
     protected void RegisterInputActions()
     {
         moveAction.performed += context => MoveInput = context.ReadValue<Vector2>();
@@ -85,11 +96,18 @@ public class MovementInputController : MonoBehaviour
         kickAction.performed += context => KickInput = false;
     }
 
+    /// <summary>
+    /// Enable actions in the event of this script component being enabled
+    /// </summary>
     private void OnEnable()
     {
         moveAction.Enable();
         kickAction.Enable();
     }
+
+    /// <summary>
+    /// Disable actions in the event of this script component being disabled
+    /// </summary>
     private void OnDisable()
     {
         moveAction.Disable();

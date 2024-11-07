@@ -4,9 +4,22 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UIElements;
 
+/// <summary>
+/// A single marble and what happens when it respawns or collides with something
+/// </summary>
 public class Marble : MonoBehaviour
 {
     Rigidbody rb;
+
+    bool isTargeted = false;
+
+    // Whether this marble is the target of a COM player
+    public bool IsTargeted
+    {  
+        get { return isTargeted; }
+        set { isTargeted = value; }
+    }
+
     // Start is called before the first frame update
     void Awake()
     {

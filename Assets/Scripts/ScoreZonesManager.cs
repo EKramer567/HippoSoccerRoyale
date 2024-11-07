@@ -19,15 +19,19 @@ namespace ZonesEnums
         BOTTOM_LEFT
     }
 
-    enum PlayerIdentity
+    public enum PlayerIdentity
     {
-        NONE,
         PLAYER,
         COM_1,
         COM_2,
-        COM_3
+        COM_3,
+        NONE
     }
 }
+
+/// <summary>
+/// Class to handle the function of score zones and score zone assignments
+/// </summary>
 public class ScoreZonesManager : MonoBehaviour
 {
     [Header("Score Identifier Text Fields")]
@@ -134,6 +138,11 @@ public class ScoreZonesManager : MonoBehaviour
         {
             identifierText.SetText(text);
         }
+
+        public override string ToString()
+        {
+            return panel.name + "|" + identifierText.name + "|" + scoreText.name;
+        }
     }
 
     void Awake()
@@ -141,7 +150,7 @@ public class ScoreZonesManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
+            //DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -199,7 +208,7 @@ public class ScoreZonesManager : MonoBehaviour
         {
             characterZoneRelations[i].ResetScore();
         }
-        Debug.Log("Scores have been reset");
+        //Debug.Log("Scores have been reset");
     }
 
     /// <summary>
@@ -225,10 +234,9 @@ public class ScoreZonesManager : MonoBehaviour
             
             characterZoneRelations[i].SetValues((PlayerZoneEnum)i, randomIDs[i], UI_ElementSections[i]);
             Set_UI_Colors(randomIDs[i], UI_ElementSections[i]);
-            PlayerManager.Instance.SetPlayerZoneAssignment(i, characterZoneRelations[i].Zone);
-            PlayerManager.Instance.SetPlayerPosition(i, characterZoneRelations[i].Zone);
+            PlayerManager.Instance.SetPlayerZoneAssignment(characterZoneRelations[i].Identifier, characterZoneRelations[i].Zone);
         }
-        Debug.Log("Disabling Highscores Panel");
+        //Debug.Log("Disabling Highscores Panel");
     }
 
     /// <summary>
@@ -242,18 +250,24 @@ public class ScoreZonesManager : MonoBehaviour
         {
             case PlayerIdentity.PLAYER:
                 uiElement.Set_UI_Section_Colors(P1_Panel_Color.WithAlpha(1.0f), P1_Panel_Color.WithAlpha(255.0f), P1_Panel_Color);
+                Debug.Log("Setting color of panel ID " + identity.ToString() + " to " + P1_Panel_Color.ToString());
                 break;
             case PlayerIdentity.COM_1:
-                uiElement.Set_UI_Section_Colors(COM_1_Panel_Color.WithAlpha(1.0f), COM_1_Panel_Color.WithAlpha(255.0f), COM_1_Panel_Color);
+                uiElement.Set_UI_Section_Colors(Color.gray, Color.gray, COM_1_Panel_Color);
+                Debug.Log("Setting color of panel ID " + identity.ToString() + " to " + COM_1_Panel_Color.ToString());
                 break;
             case PlayerIdentity.COM_2:
-                uiElement.Set_UI_Section_Colors(COM_2_Panel_Color.WithAlpha(1.0f), COM_2_Panel_Color.WithAlpha(255.0f), COM_2_Panel_Color);
+                uiElement.Set_UI_Section_Colors(Color.gray, Color.gray, COM_2_Panel_Color);
+                Debug.Log("Setting color of panel ID " + identity.ToString() + " to " + COM_2_Panel_Color.ToString());
                 break;
             case PlayerIdentity.COM_3:
-                uiElement.Set_UI_Section_Colors(COM_3_Panel_Color.WithAlpha(1.0f), COM_3_Panel_Color.WithAlpha(255.0f), COM_3_Panel_Color);
+                uiElement.Set_UI_Section_Colors(Color.gray, Color.gray, COM_3_Panel_Color);
+                Debug.Log("Setting color of panel ID " + identity.ToString() + " to " + COM_3_Panel_Color.ToString());
                 break;
             default:
                 uiElement.Set_UI_Section_Colors(Color.gray, Color.gray, Color.gray.WithAlpha(210.0f));
+                Debug.LogError("Error: Attempted to set colors for player identity that was out of normal range: " + identity.ToString()
+                    + " at UI Element " + uiElement.ToString());
                 break;
         }
     }

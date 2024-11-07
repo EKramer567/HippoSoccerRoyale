@@ -2,6 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Class to define and initialize the states of players
+/// To be used with animations
+/// </summary>
 public class PlayerStateController : MonoBehaviour
 {
     public enum CharacterStates

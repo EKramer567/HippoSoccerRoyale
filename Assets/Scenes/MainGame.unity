@@ -1714,7 +1714,7 @@ Transform:
   m_GameObject: {fileID: 342747753}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 508.06424, y: 562.0962, z: 4.768483}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2008,6 +2008,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2582287949944566712, guid: 2ee7d3b6cb59d05439576e8bae662035, type: 3}
   m_PrefabInstance: {fileID: 5007086270640078927}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &382978325 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4265976332500224460, guid: 2ee7d3b6cb59d05439576e8bae662035, type: 3}
+  m_PrefabInstance: {fileID: 5007086270640078927}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dba9f4c9c338af34ba85a2d84cfb5acd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &392000990
 GameObject:
   m_ObjectHideFlags: 0
@@ -6064,6 +6075,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c00cf6ac32186849bb7f3ee62e3aad0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &974245945 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 106339405175821671, guid: 7aa56b30609b2c84ca68b2e06e88f29c, type: 3}
+  m_PrefabInstance: {fileID: 1085876840}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eab6ae4261e3b8c4c8a9a0d15b032303, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &982308623
 GameObject:
   m_ObjectHideFlags: 0
@@ -7425,9 +7447,9 @@ MonoBehaviour:
   - PointZone Bottom Right
   - PointZone Bottom Left
   P1_Panel_Color: {r: 1, g: 0, b: 0, a: 0.8627451}
-  COM_1_Panel_Color: {r: 0.22432362, g: 0.45730847, b: 0.6698113, a: 0.8235294}
-  COM_2_Panel_Color: {r: 0.6037736, g: 0.58458644, b: 0.259167, a: 0.8235294}
-  COM_3_Panel_Color: {r: 0.22582376, g: 0.5849056, b: 0.20692417, a: 0.8235294}
+  COM_1_Panel_Color: {r: 0, g: 0, b: 1, a: 0.8235294}
+  COM_2_Panel_Color: {r: 1, g: 0.9431818, b: 0, a: 0.8235294}
+  COM_3_Panel_Color: {r: 0.029481225, g: 0.8156863, b: 0, a: 0.8235294}
 --- !u!1 &1143690979
 GameObject:
   m_ObjectHideFlags: 0
@@ -7796,6 +7818,7 @@ MonoBehaviour:
   - {fileID: 101080394}
   - {fileID: 1868665424}
   - {fileID: 790829033}
+  arenaRadius: 21
 --- !u!1 &1297311441
 GameObject:
   m_ObjectHideFlags: 0
@@ -9271,6 +9294,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0c00cf6ac32186849bb7f3ee62e3aad0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1484011021 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 106339405175821671, guid: 7aa56b30609b2c84ca68b2e06e88f29c, type: 3}
+  m_PrefabInstance: {fileID: 2038317360}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eab6ae4261e3b8c4c8a9a0d15b032303, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1492063346
@@ -11282,7 +11316,11 @@ MonoBehaviour:
   - {fileID: 2582287948319625232}
   - {fileID: 1484011017}
   - {fileID: 974245941}
-  inputControllers: []
+  inputControllers:
+  - {fileID: 382978325}
+  - {fileID: 2582287948319625236}
+  - {fileID: 1484011021}
+  - {fileID: 974245945}
 --- !u!4 &1748749210
 Transform:
   m_ObjectHideFlags: 0
@@ -13909,6 +13947,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0c00cf6ac32186849bb7f3ee62e3aad0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &2582287948319625236 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 106339405175821671, guid: 7aa56b30609b2c84ca68b2e06e88f29c, type: 3}
+  m_PrefabInstance: {fileID: 500129929537992744}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eab6ae4261e3b8c4c8a9a0d15b032303, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1001 &4288684526117413391
