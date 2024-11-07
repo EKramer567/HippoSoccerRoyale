@@ -4,6 +4,9 @@ using static GameStateController;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
+/// <summary>
+/// Class to manage highscores, sort them, and put them on the highscores board to be displayed
+/// </summary>
 public class HighscoresManager : MonoBehaviour
 {
     [SerializeField]
@@ -42,6 +45,9 @@ public class HighscoresManager : MonoBehaviour
 
     int winningHighScore;
 
+    /// <summary>
+    /// The player's submitted name
+    /// </summary>
     public bool SubmittedName { get; private set; }
 
     public static HighscoresManager Instance { get; private set; }
@@ -74,6 +80,7 @@ public class HighscoresManager : MonoBehaviour
             OnReceiveInputEvent = new UnityEvent<string, int>();
         }
 
+        // get the action to allow submitting to be done using the Enter key, but keep disabled for now
         submitAction = UI_submitActionAsset.FindActionMap(UI_ACTION_MAP_NAME).FindAction(UI_SUBMIT_ACTION_NAME);
         submitAction.Disable();
 
@@ -86,6 +93,7 @@ public class HighscoresManager : MonoBehaviour
         OnReceiveInputEvent.AddListener(PlayerPrefsManager.Instance.InputNewPlayerHighscore);
         OnEnableHighscoresPanelEvent.AddListener(PlayerPrefsManager.Instance.DisplayHighscores);
 
+        // set the input field to validate characters as they are being entered
         inputField.onValidateInput = (string text, int charIndex, char addedChar) =>
         {
             return ValidateChar(INPUT_VALID_CHARACTERS, addedChar);
@@ -102,6 +110,9 @@ public class HighscoresManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Register the submit action so it can be used later
+    /// </summary>
     void RegisterInputActions()
     {
         submitAction.performed += context => SubmittedName = true;
@@ -128,6 +139,9 @@ public class HighscoresManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Enable the panel a player would use to input their name if they achieved a new highscore
+    /// </summary>
     public void EnableInputPanel()
     {
         inputField.text = "";
@@ -135,6 +149,9 @@ public class HighscoresManager : MonoBehaviour
         submitAction.Enable();
     }
 
+    /// <summary>
+    /// Function to receive the player's input name and give it to the highscores panel to display
+    /// </summary>
     public void ReceiveInput()
     {
         OnReceiveInputEvent.Invoke(inputField.text, winningHighScore);
@@ -142,12 +159,19 @@ public class HighscoresManager : MonoBehaviour
         EnableHighscoresPanel(false); //we're done setting a new high score and getting the name, so open the highscores panel
     }
 
+    /// <summary>
+    /// Disable the panel a player would use to input their name if they achieved a new highscore
+    /// </summary>
     public void DisableInputPanel()
     {
         inputPanel.SetActive(false);
         submitAction.Disable();
     }
 
+    /// <summary>
+    /// Enable the panel showing player highscores
+    /// </summary>
+    /// <param name="newHighscoreSet">Whether to show the Input Panel first or just go straight to the Highscores panel</param>
     public void EnableHighscoresPanel(bool newHighscoreSet)
     {
         if (newHighscoreSet)
@@ -161,18 +185,31 @@ public class HighscoresManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Enable the panel showing player highscores
+    /// </summary>
     public void DisableHighscoresPanel()
     {
         highScoresPanel.SetActive(false);
-        Debug.Log("Disabling Highscores Panel");
+        //Debug.Log("Disabling Highscores Panel");
     }
 
+    /// <summary>
+    /// Get the highscore that was just set so the value can be displayed on the Input panel
+    /// </summary>
+    /// <param name="winningScore"></param>
     public void GetNewScore(int winningScore)
     {
         winningHighScore = winningScore;
         inputPanelScoreText.SetText(winningHighScore.ToString());
     }
 
+    /// <summary>
+    /// Validate the player's input so they can't just enter anything as a name
+    /// </summary>
+    /// <param name="validChars">Collection of valid characters for a player to input</param>
+    /// <param name="addedChar">Character to add to the input string after validation</param>
+    /// <returns></returns>
     private char ValidateChar(string validChars, char addedChar)
     {
         if (validChars.IndexOf(addedChar) != -1)

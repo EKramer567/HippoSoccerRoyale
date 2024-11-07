@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
+/// <summary>
+/// A class to handle marble object spawning, as well as particle effects that happen when they fall off the arena
+/// </summary>
 public class MarbleManager : MonoBehaviour
 {
     [SerializeField]
@@ -84,6 +87,9 @@ public class MarbleManager : MonoBehaviour
         UpdateMarbleSpawning();
     }
 
+    /// <summary>
+    /// Spawn marbles in a random range of locations around the arena after a set time and only while they are not all on field
+    /// </summary>
     void UpdateMarbleSpawning()
     {
         if (spawnTimerActive && activeCount < maxNumberActiveMarbles)
@@ -101,6 +107,10 @@ public class MarbleManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Disable all marble objects
+    /// Used in resetting
+    /// </summary>
     public void DisableAllMarbles()
     {
         spawnDelayTimer = 0;
@@ -108,14 +118,23 @@ public class MarbleManager : MonoBehaviour
         {
             marb.SetActive(false);
         }
-        Debug.Log("Disabling all marbles on field");
+        //Debug.Log("Disabling all marbles on field");
     }
 
+    /// <summary>
+    /// Play the splash particle effect when colliding with water
+    /// </summary>
+    /// <param name="collide">The collider of the water</param>
+    /// <param name="objPosition">Position of the object at the point of collision</param>
     public void PlaySplash(Collider collide, Vector3 objPosition)
     {
         StartCoroutine(WaitForSplash(collide, objPosition));
     }
 
+    /// <summary>
+    /// Cycle through particle objects and play one that isn't being used
+    /// </summary>
+    /// <param name="location">Location at which to play this particle effect</param>
     private void SplashEffect(Vector3 location)
     {
         ParticleSystem frontEffect = splashParticleObjects.Peek();
@@ -128,6 +147,12 @@ public class MarbleManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Wait for a time before playing a splash particle effect
+    /// </summary>
+    /// <param name="coll">Collider of the water</param>
+    /// <param name="pos">Position of marble</param>
+    /// <returns>WaitForSeconds</returns>
     private IEnumerator WaitForSplash(Collider coll, Vector3 pos)
     {
         yield return new WaitForSeconds(splashWaitTime);

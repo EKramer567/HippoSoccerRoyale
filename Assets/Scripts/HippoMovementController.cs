@@ -1,4 +1,5 @@
 using UnityEngine;
+using ZonesEnums;
 
 public class HippoMovementController : MonoBehaviour
 {
@@ -32,7 +33,11 @@ public class HippoMovementController : MonoBehaviour
 
     PlayerStateController stateController;
 
-    MovementInputController movementInputCtrl;
+    InputControllerData movementInputCtrl;
+
+    PlayerZoneEnum thisPlayerZone;
+
+    public PlayerZoneEnum ThisPlayerZone {  get { return thisPlayerZone; } }
 
     // Start is called before the first frame update
     void Start()
@@ -49,7 +54,7 @@ public class HippoMovementController : MonoBehaviour
 
         if (movementInputCtrl == null)
         {
-            movementInputCtrl = GetComponent<MovementInputController>();
+            movementInputCtrl = GetComponent<InputControllerData>();
         }
 
         stateController.CurrentState = PlayerStateController.CharacterStates.IDLE;
@@ -65,6 +70,7 @@ public class HippoMovementController : MonoBehaviour
     /// </summary>
     protected void HippoMovement()
     {
+        Debug.DrawLine(ArenaLocations.Instance.CenterLocation, visualModel.position, Color.black);
         Vector2 moveVal = movementInputCtrl.MovementValue;
         if (GameStateController.Instance.CurrentGameState != GameStateController.GameStates.PLAYING)
         {
@@ -146,5 +152,24 @@ public class HippoMovementController : MonoBehaviour
             stateController.CurrentState = PlayerStateController.CharacterStates.KICKING;
             kickParticles.Play();
         }
+    }
+
+    /// <summary>
+    /// Assign this player the zone they're supposed to be scoring in this round
+    /// </summary>
+    /// <param name="zone">Zone assignment</param>
+    public void AssignPlayerZone(PlayerZoneEnum zone)
+    {
+        thisPlayerZone = zone;
+        //Debug.Log("Assigning Player Zones - " + this.name + " is assigned " + thisPlayerZone.ToString());
+    }
+
+    /// <summary>
+    /// Point this player toward the center of the arena
+    /// To be called on start/reset of game
+    /// </summary>
+    public void PointPlayerToCenter()
+    {
+        visualModel.transform.LookAt(ArenaLocations.Instance.CenterLocation, Vector3.up);
     }
 }

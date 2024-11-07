@@ -21,8 +21,8 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: T_Hippo
-  m_Shader: {fileID: -6465566751694194690, guid: 4acd2adc1c0ab324f9246f7debbd23b1, type: 3}
-  m_Parent: {fileID: 2100000, guid: ec04d1018ba2cce4c9e7ca76d4345a88, type: 2}
+  m_Shader: {fileID: -6465566751694194690, guid: 32cea267ef0faf04fb25d0db6009ec8f, type: 3}
+  m_Parent: {fileID: 2100000, guid: 18ac6b489e9840e4f97133dda254bbe6, type: 2}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords:
