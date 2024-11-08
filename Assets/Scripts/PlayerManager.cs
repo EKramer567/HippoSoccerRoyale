@@ -3,8 +3,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using ZonesEnums;
-using static UnityEditor.Experimental.GraphView.GraphView;
-using Unity.VisualScripting;
 
 /// <summary>
 /// Class to handle spawn locations and zone assignments
@@ -50,8 +48,10 @@ public class PlayerManager : MonoBehaviour
             // Give the player controllers the location of their starting position (to use as default navigation)
             inputControllers[(int)id].StartLocation = ArenaLocations.Instance.StartLocationsList[(int)(zone)].position;
 
-            // Give the player controllers the location of the zone they're trying to score into
-            inputControllers[(int)id].ZoneLocation = ArenaLocations.Instance.ZoneLocationsList[(int)(zone)].position;
+            // Give the player controllers the location of the zone they're trying to score into (with an offset Y coordinate to level with the field)
+            inputControllers[(int)id].ZoneLocation 
+                = new Vector3(ArenaLocations.Instance.ZoneLocationsList[(int)(zone)].position.x, 1, 
+                ArenaLocations.Instance.ZoneLocationsList[(int)(zone)].position.z);
 
             // Point player toward center of the arena
             hippoMovementControllers[(int)id].PointPlayerToCenter();

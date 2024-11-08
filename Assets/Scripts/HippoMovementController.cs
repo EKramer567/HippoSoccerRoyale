@@ -70,7 +70,7 @@ public class HippoMovementController : MonoBehaviour
     /// </summary>
     protected void HippoMovement()
     {
-        Debug.DrawLine(ArenaLocations.Instance.CenterLocation, visualModel.position, Color.black);
+        //Debug.DrawLine(ArenaLocations.Instance.CenterLocation, visualModel.position, Color.black);
         Vector2 moveVal = movementInputCtrl.MovementValue;
         if (GameStateController.Instance.CurrentGameState != GameStateController.GameStates.PLAYING)
         {

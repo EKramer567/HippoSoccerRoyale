@@ -5063,7 +5063,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eab6ae4261e3b8c4c8a9a0d15b032303, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  actionAsset: {fileID: -944628639613478452, guid: a035e26e8d23d5c458a09a00f0d98f54, type: 3}
+  marbleMask:
+    serializedVersion: 2
+    m_Bits: 64
 --- !u!114 &5264010545548995752
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -59,6 +59,8 @@ public class ScoreZonesManager : MonoBehaviour
     [SerializeField]
     Color COM_1_Panel_Color, COM_2_Panel_Color, COM_3_Panel_Color;
 
+    const float PARTIAL_ALPHA = 0.8f;
+
     CharacterZoneData[] characterZoneRelations = new CharacterZoneData[4];
     Score_UI_Element[] UI_ElementSections = new Score_UI_Element[4];
 
@@ -249,23 +251,23 @@ public class ScoreZonesManager : MonoBehaviour
         switch (identity)
         {
             case PlayerIdentity.PLAYER:
-                uiElement.Set_UI_Section_Colors(P1_Panel_Color.WithAlpha(1.0f), P1_Panel_Color.WithAlpha(255.0f), P1_Panel_Color);
+                uiElement.Set_UI_Section_Colors(ColorWithAlpha(P1_Panel_Color, 1), ColorWithAlpha(P1_Panel_Color, 1f)/*.WithAlpha(255.0f)*/, ColorWithAlpha(P1_Panel_Color, PARTIAL_ALPHA));
                 Debug.Log("Setting color of panel ID " + identity.ToString() + " to " + P1_Panel_Color.ToString());
                 break;
             case PlayerIdentity.COM_1:
-                uiElement.Set_UI_Section_Colors(Color.gray, Color.gray, COM_1_Panel_Color);
+                uiElement.Set_UI_Section_Colors(Color.gray, Color.gray, ColorWithAlpha(COM_1_Panel_Color, PARTIAL_ALPHA));
                 Debug.Log("Setting color of panel ID " + identity.ToString() + " to " + COM_1_Panel_Color.ToString());
                 break;
             case PlayerIdentity.COM_2:
-                uiElement.Set_UI_Section_Colors(Color.gray, Color.gray, COM_2_Panel_Color);
+                uiElement.Set_UI_Section_Colors(Color.gray, Color.gray, ColorWithAlpha(COM_2_Panel_Color, PARTIAL_ALPHA));
                 Debug.Log("Setting color of panel ID " + identity.ToString() + " to " + COM_2_Panel_Color.ToString());
                 break;
             case PlayerIdentity.COM_3:
-                uiElement.Set_UI_Section_Colors(Color.gray, Color.gray, COM_3_Panel_Color);
+                uiElement.Set_UI_Section_Colors(Color.gray, Color.gray, ColorWithAlpha(COM_3_Panel_Color, PARTIAL_ALPHA));
                 Debug.Log("Setting color of panel ID " + identity.ToString() + " to " + COM_3_Panel_Color.ToString());
                 break;
             default:
-                uiElement.Set_UI_Section_Colors(Color.gray, Color.gray, Color.gray.WithAlpha(210.0f));
+                uiElement.Set_UI_Section_Colors(Color.gray, Color.gray, Color.magenta);
                 Debug.LogError("Error: Attempted to set colors for player identity that was out of normal range: " + identity.ToString()
                     + " at UI Element " + uiElement.ToString());
                 break;
@@ -296,5 +298,19 @@ public class ScoreZonesManager : MonoBehaviour
             }
         }
         return -1;
+    }
+
+    /// <summary>
+    /// Little helper method so I dont have to have separate colors with different alphas for UI
+    /// Apparently the Color.WithAlpha function is some sort of experimental extension method with no documentation
+    /// </summary>
+    /// <param name="color">Color to re-alpha</param>
+    /// <param name="alpha">amount of alpha transparency (0 - 1)</param>
+    /// <returns></returns>
+    Color ColorWithAlpha(Color color, float alpha)
+    {
+        Color returnColor = color;
+        returnColor.a = alpha;
+        return returnColor;
     }
 }
