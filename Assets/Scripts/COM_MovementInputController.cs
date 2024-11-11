@@ -41,7 +41,6 @@ public class COM_MovementInputController : InputControllerData
     {        
         targetMarbles = MarbleManager.Instance.SceneMarbles;
         marbleComponents = new List<Marble>();
-        //marbleMask = 6; // Layer number of marbles
 
         for (int i = 0; i < targetMarbles.Count; i++)
         {
@@ -51,7 +50,6 @@ public class COM_MovementInputController : InputControllerData
 
     private void FixedUpdate()
     {
-        //Debug.DrawLine(ArenaLocations.Instance.CenterLocation, new Vector3(ArenaLocations.Instance.ArenaRadius, 1, 0), Color.black);
         if (MovementEnabled)
         {
             ScanForTarget();
@@ -80,6 +78,7 @@ public class COM_MovementInputController : InputControllerData
         }
         else
         {
+            // stop moving
             fakeInputValue = Vector2.zero;
         }
 
@@ -96,18 +95,14 @@ public class COM_MovementInputController : InputControllerData
             startNewScan = false;
             target = FindTarget();
             StartCoroutine(WaitForSearch());
-            //Debug.DrawLine(transform.position, target, Color.black);
-            //Debug.Log("New Scan Started...");
         }
+
+        // Debugging
         Debug.DrawLine(ZoneLocation, target, Color.magenta);
         Debug.DrawRay(target, -(ZoneLocation - target), Color.yellow);
-
         Vector3 intercept = FindInterceptTarget(target);
-        Debug.DrawRay(transform.position, intercept, Color.blue);
         Vector3 closestPerp = FindClosestPerpendicular(-(ZoneLocation - target), targetMarbleLocation, UNITS_BEHIND_MARBLE_OFFSET);
         Debug.DrawLine(targetMarbleLocation, closestPerp, Color.black);
-
-
         Debug.DrawLine(transform.position, target, Color.cyan);
     }
 
@@ -137,14 +132,9 @@ public class COM_MovementInputController : InputControllerData
 
             float goalDist = Vector3.Distance(targetMarbles[i].transform.position, ZoneLocation);
 
-            // Prioritize marbles closest to this COM's zone over marbles that are just closest to itself
-            //bool goAfterThisMarble = (goalDist < minGoalDist) || (dist < minDist);
-            bool goAfterThisMarble = (goalDist < minGoalDist);
-            //if (goAfterThisMarble == false) { goAfterThisMarble = (dist < minDist); }
-
             // only go after marbles that are active and aren't currently in the air or falling off the arena
             // and prioritize marbles that are closer to this COM's score zone
-            if (goAfterThisMarble && targetMarbles[i].activeInHierarchy 
+            if (goalDist < minGoalDist && targetMarbles[i].activeInHierarchy 
                 && Mathf.Abs(targetMarbles[i].transform.position.y - transform.position.y) < 4.0f
                 && Vector3.Distance(targetMarbles[i].transform.position, ArenaLocations.Instance.CenterLocation) < ArenaLocations.Instance.ArenaRadius)
             {
@@ -156,11 +146,11 @@ public class COM_MovementInputController : InputControllerData
                     RaycastHit hit;
                     Vector3 dir = (interceptTargetLocation - transform.position).normalized;
                     
+                    // Cast a sphere toward the target intercept point and see if we'd collide with the marble we're after
                     if (Physics.SphereCast(transform.position, SPHERECAST_RADIUS, dir, out hit, SPHERECAST_DISTANCE, marbleMask))
                     {
                         if (hit.collider.gameObject == targetMarbles[i])
                         {
-                            Debug.DrawRay(transform.position, transform.forward*5, Color.white, 1.0f);
                             // Moving toward the target marble's intercept point would collide with the marble, move around it first
                             closestPosition = FindClosestPerpendicular(dir, targetMarbles[i].transform.position, UNITS_BEHIND_MARBLE_OFFSET);
                             minDist = dist;
@@ -184,44 +174,42 @@ public class COM_MovementInputController : InputControllerData
                     minGoalDist = goalDist;
                     closestSet = true;
                 }
+
                 // Debugging
                 targetMarbleLocation = targetMarbles[i].transform.position;
-                // Debugging
-
-                
-                //marbleComponents[i].IsTargeted = true;
-
-                //Debug.Log("Target Set - targetMarbles[" + i + "] ");
             }
         }
+
+        // If we didn't find a suitable target, just head back to the default position
         if (!closestSet)
         {
             closestPosition = StartLocation;
-            //Debug.Log("00000 Setting target to default");
         }
 
         return closestPosition;
     }
 
+    /// <summary>
+    /// Calculate a point behind a marble where, if pushed from that side, the marble would go toward
+    /// the COM's score zone
+    /// </summary>
+    /// <param name="marbleLocation">Position of the marble we're looking at</param>
+    /// <returns></returns>
     Vector3 FindInterceptTarget(Vector3 marbleLocation)
-    {
-        Vector3 interceptTar = Vector3.zero;
-        
+    {        
         // step 1: create a vector indicating the direction between the target marble and the player's score zone location
         Vector3 behindMarbleDir = -(ZoneLocation - marbleLocation).normalized;
 
         // 1.1: make a line behind the marble using that direction vector, indicating a range of potential interception points
+        //      (offset this line slightly so no potential interception points end up inside the marble)
         Vector3 behindMarblePos = marbleLocation + (behindMarbleDir * UNITS_BEHIND_MARBLE_OFFSET);
         Vector3 behindMarbleEndPos = marbleLocation + (behindMarbleDir * (UNITS_BEHIND_MARBLE_OFFSET + 2));
 
         // step 2: going backward from the step 2 vector, get the closest interception point where the player should go to be able to aim the marble at their zone
-        interceptTar = GetClosestPointOnFiniteLine(transform.position, behindMarblePos, behindMarbleEndPos);
+        return GetClosestPointOnFiniteLine(transform.position, behindMarblePos, behindMarbleEndPos);
 
-        
         // step 3: use that point to calculate the difference between the player-marble vector and the marble-zone vector and turn toward the marble
         //         if the vectors are similar enough (if player distance from the closest point along that line is small enough)
-
-        return interceptTar;
     }
 
     /// <summary>
@@ -231,7 +219,7 @@ public class COM_MovementInputController : InputControllerData
     /// <param name="dirLine">A direction vector to act as the line to get a perpendicular point from</param>
     /// <param name="point">A point on that direction vector line to project the perpendicular line from</param>
     /// <param name="distance">How far the resulting location should be from the perpendicular line</param>
-    /// <returns></returns>
+    /// <returns>A point along the perpendicular line, at the designated distance away from the origin</returns>
     Vector3 FindClosestPerpendicular(Vector3 dirLine, Vector3 point, float distance)
     {
         Vector3 perpTar = Vector3.zero;
@@ -254,6 +242,11 @@ public class COM_MovementInputController : InputControllerData
         return perpTar;
     }
 
+    /// <summary>
+    /// Coroutine just for waiting a certain time between target scans
+    /// Just so the COM doesn't scan every update
+    /// </summary>
+    /// <returns>WaitForSeconds</returns>
     IEnumerator WaitForSearch()
     {
         yield return new WaitForSeconds(CHECK_INTERVAL);
@@ -262,6 +255,7 @@ public class COM_MovementInputController : InputControllerData
 
     /// <summary>
     /// Kick action to be called when appropriate for the COM to kick a marble
+    /// (I decided not to implement this since the COM players are already difficult enough)
     /// </summary>
     void Kick()
     {
@@ -288,13 +282,19 @@ public class COM_MovementInputController : InputControllerData
         }
     }
 
-    // For finite lines:
-    Vector3 GetClosestPointOnFiniteLine(Vector3 point, Vector3 line_start, Vector3 line_end)
+    /// <summary>
+    /// Get closest point to the specified location, on a line that has beginning and ending point
+    /// </summary>
+    /// <param name="loc">The location of the object we want to measure from</param>
+    /// <param name="startPoint">The beginning of the line segment to follow</param>
+    /// <param name="endPoint">The end of the line segment</param>
+    /// <returns>Closest point on that line relative to the designated location</returns>
+    Vector3 GetClosestPointOnFiniteLine(Vector3 loc, Vector3 startPoint, Vector3 endPoint)
     {
-        Vector3 line_direction = line_end - line_start;
+        Vector3 line_direction = endPoint - startPoint;
         float line_length = line_direction.magnitude;
         line_direction.Normalize();
-        float project_length = Mathf.Clamp(Vector3.Dot(point - line_start, line_direction), 0f, line_length);
-        return line_start + line_direction * project_length;
+        float project_length = Mathf.Clamp(Vector3.Dot(loc - startPoint, line_direction), 0f, line_length);
+        return startPoint + line_direction * project_length;
     }
 }

@@ -11,15 +11,6 @@ public class Marble : MonoBehaviour
 {
     Rigidbody rb;
 
-    bool isTargeted = false;
-
-    // Whether this marble is the target of a COM player
-    public bool IsTargeted
-    {  
-        get { return isTargeted; }
-        set { isTargeted = value; }
-    }
-
     // Start is called before the first frame update
     void Awake()
     {
